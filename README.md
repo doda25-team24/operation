@@ -6,4 +6,4 @@
 
 **lib-version:** https://github.com/doda25-team24/lib-version
 
-**operation:**(current) https://github.com/doda25-team24/model-service
+**operation:**(current) https://github.com/doda25-team24/operation
