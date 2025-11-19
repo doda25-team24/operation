@@ -2,9 +2,7 @@
 
 **model-service:** https://github.com/doda25-team24/model-service
 
-**app-frontend:** https://github.com/doda25-team24/app-frontend
-
-**app-service:** https://github.com/doda25-team24/app-service
+**app:** https://github.com/doda25-team24/app
 
 **lib-version:** https://github.com/doda25-team24/lib-version
 
