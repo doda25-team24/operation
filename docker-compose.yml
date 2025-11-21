@@ -7,12 +7,14 @@ services:
     build:
       context: ../model-service  # Path to the model-service folder
       dockerfile: Dockerfile
+      target: production #f10
     container_name: sms-checker-model-service
     ports:
       - "8081:8081" # Maps local port 8081 to 8081 in the container
     # Models are trained inside the container, so a persistent volume for the 'output' folder 
     # is not strictly necessary unless you want to keep the models outside of Docker.
-
+    volumes: 
+        - ../model-service/output:/model-service/models 
   # Frontend/Backend Service (Spring Boot App)
   app:
     # Specifies that Docker should use the Dockerfile in app and assigns the build context.
