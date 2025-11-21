@@ -3,31 +3,41 @@ version: '3.8'
 services:
   # Backend Service (Python AI Model)
   model-service:
-    # Specifies that Docker should use the Dockerfile in model-service and assigns the build context.
     build:
-      context: ../model-service  # Path to the model-service folder
+      context: ../model-service           # Path to the model-service folder
       dockerfile: Dockerfile
-      target: production #f10
+      target: production                  # F10
     container_name: sms-checker-model-service
+
+    # Port inside the container is controlled by MODEL_PORT (default 8081)
+    environment:
+      - MODEL_PORT=8081
+
+    # Host port 8081 -> container port 8081
     ports:
-      - "8081:8081" # Maps local port 8081 to 8081 in the container
-    # Models are trained inside the container, so a persistent volume for the 'output' folder 
-    # is not strictly necessary unless you want to keep the models outside of Docker.
-    volumes: 
-        - ../model-service/output:/model-service/models 
-  # Frontend/Backend Service (Spring Boot App)
+      - "8081:8081"
+
+    # Optional: persist trained models outside the container
+    # Make sure the right-hand side matches where your code reads from (`output/`)
+    volumes:
+      - ../model-service/output:/model-service/output
+
+  # Frontend Service (Spring Boot App)
   app:
-    # Specifies that Docker should use the Dockerfile in app and assigns the build context.
     build:
-      context: ../app # Path to the app folder
+      context: ../app                     # Path to the app folder
       dockerfile: Dockerfile
     container_name: sms-checker-app
-    ports:
-      - "8080:8080" # Maps local port 8080 to 8080 in the container
-    # The crucial variable that points to the model service. The service name 'model-service' 
-    # is resolved within the Docker network.
+
+    # APP_PORT controls Spring Boot's server.port, MODEL_HOST points to the backend
     environment:
+      - APP_PORT=8080
       - MODEL_HOST=http://model-service:8081
-    # Ensures the application does not start until the model service is created and ready
+
+    # Host port 8080 -> container port 8080
+    ports:
+      - "8080:8080"
+
+    # Ensure the app waits for the backend container to be created
     depends_on:
       - model-service
