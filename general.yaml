@@ -68,13 +68,14 @@
         value: "1"
         state: present
         reload: yes
-        
-    - name: add etc/hosts
-      ansible.builtin.copy:
-        dest: /etc/hosts
-        content: | 
-          overlay
-          br_netfilter
-        mode: '0644'        
+
+    - name: Update /etc/hosts with Master and Worker nodes
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        create: true
+        block: |
+          192.168.56.100 ctrl
+          192.168.56.101 node-1
+          192.168.56.102 node-2
     
 
