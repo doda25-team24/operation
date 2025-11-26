@@ -1,0 +1,3 @@
+# Docker orchestration tool
+docker-compose>=1.29.2
+
