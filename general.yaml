@@ -1,0 +1,80 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Ensure users exist
+      user:
+        name: "{{ item }}"
+        state: present
+        shell: /bin/bash
+      loop:
+        - user1
+        - user2
+
+    - name: Set authorized keys from GitHub
+      ansible.posix.authorized_key:
+        user: "{{ item }}"
+        state: present
+        key: "https://github.com/{{ item }}.keys"
+      loop:
+        - itsnotelena
+        - SarinhaCortez
+
+    - name: Disable SWAP
+      ansible.builtin.shell:
+        cmd: swapoff -a
+
+    - name: Comment out SWAP line in /etc/fstab
+      ansible.builtin.lineinfile:
+        path: /etc/fstab
+        regexp: 'swap'
+        state: absent
+
+    - name: Create the .conf file to load modules at boot
+      ansible.builtin.copy:
+        dest: /etc/modules-load.d/k8s.conf
+        content: |
+          overlay
+          br_netfilter
+        mode: '0644'
+
+    - name: Load br_netfilter module into the running kernel
+      community.general.modprobe:
+        name: br_netfilter
+        state: present
+
+    - name: Load overlay module into the running kernel
+      community.general.modprobe:
+        name: overlay
+        state: present
+
+    - name: Enable IPv4 forwarding
+      ansible.builtin.sysctl:
+        name: net.ipv4.ip_forward
+        value: "1"
+        state: present
+        reload: yes
+
+    - name: Send bridged traffic through iptables (IPv4)
+      ansible.builtin.sysctl:
+        name: net.bridge.bridge-nf-call-iptables
+        value: "1"
+        state: present
+        reload: yes
+
+    - name: Send bridged traffic through iptables (IPv6)
+      ansible.builtin.sysctl:
+        name: net.bridge.bridge-nf-call-ip6tables
+        value: "1"
+        state: present
+        reload: yes
+        
+    - name: add etc/hosts
+      ansible.builtin.copy:
+        dest: /etc/hosts
+        content: | 
+          overlay
+          br_netfilter
+        mode: '0644'        
+    
+
