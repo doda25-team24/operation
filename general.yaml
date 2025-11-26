@@ -2,6 +2,7 @@
 - hosts: all
   become: yes
   tasks:
+    #step 4
     - name: Ensure users exist
       user:
         name: "{{ item }}"
@@ -20,6 +21,8 @@
         - itsnotelena
         - SarinhaCortez
 
+    #step 5
+
     - name: Disable SWAP
       ansible.builtin.shell:
         cmd: swapoff -a
@@ -30,6 +33,7 @@
         regexp: 'swap'
         state: absent
 
+    #step 6
     - name: Create the .conf file to load modules at boot
       ansible.builtin.copy:
         dest: /etc/modules-load.d/k8s.conf
@@ -48,6 +52,7 @@
         name: overlay
         state: present
 
+    #step 7
     - name: Enable IPv4 forwarding
       ansible.builtin.sysctl:
         name: net.ipv4.ip_forward
@@ -68,7 +73,8 @@
         value: "1"
         state: present
         reload: yes
-
+        
+    #step 8
     - name: Update /etc/hosts with Master and Worker nodes
       ansible.builtin.blockinfile:
         path: /etc/hosts
@@ -78,6 +84,7 @@
           192.168.56.101 node-1
           192.168.56.102 node-2
 
+    #step 9
     - name: Add Kubernetes official release repository and signing key
       block:
       - name: Download Kubernetes GPG key
@@ -96,3 +103,20 @@
       ansible.builtin.apt:
         update_cache: yes
         
+    #step 10
+    - name: Install containerd and runc
+      ansible.builtin.apt:
+        name:
+          - containerd=1.7.24-1
+          - runc=1.1.12-1
+        state: present
+        update_cache: yes
+
+    - name: Install kubeadm, kubelet, and kubectl
+      ansible.builtin.apt:
+        name:
+          - kubeadm=1.32.4-00
+          - kubelet=1.32.4-00
+          - kubectl=1.32.4-00
+        state: present
+        update_cache: yes
