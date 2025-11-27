@@ -146,4 +146,38 @@
           - kubectl=1.32.4-1.1
         state: present
         update_cache: yes
+       # step 11
+    - name: Ensure containerd directory exists
+      ansible.builtin.file:
+        path: /etc/containerd
+        state: directory
+        mode: '0755'
+
+    - name: Generate default containerd config
+      ansible.builtin.shell: containerd config default > /etc/containerd/config.toml
+      args:
+        creates: /etc/containerd/config.toml
+
+    - name: Disable AppArmor in containerd
+      ansible.builtin.lineinfile:
+        path: /etc/containerd/config.toml
+        regexp: 'disable_apparmor ='
+        line: '    disable_apparmor = true'
+
+    - name: Update sandbox image
+      ansible.builtin.lineinfile:
+        path: /etc/containerd/config.toml
+        regexp: 'sandbox_image ='
+        line: '    sandbox_image = "registry.k8s.io/pause:3.10"'
+
+    - name: Enable SystemdCgroup for runc
+      ansible.builtin.lineinfile:
+        path: /etc/containerd/config.toml
+        regexp: 'SystemdCgroup ='
+        line: '            SystemdCgroup = true'
+
+    - name: Restart containerd
+      ansible.builtin.service:
+        name: containerd
+        state: restarted
         
