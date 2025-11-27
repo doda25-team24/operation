@@ -2,15 +2,20 @@
 - hosts: all
   become: yes
   tasks:
-    #step 4
+
+    ########################################
+    # STEP 4 — ADD USERS + REGISTER SSH KEYS
+    ########################################
     - name: Ensure users exist
-      user:
+      ansible.builtin.user:
         name: "{{ item }}"
         state: present
         shell: /bin/bash
       loop:
-        - user1
-        - user2
+        - itsnotelena
+        - SarinhaCortez
+        - BernaJojo
+        - WotsM
 
     - name: Set authorized keys from GitHub
       ansible.posix.authorized_key:
@@ -20,21 +25,27 @@
       loop:
         - itsnotelena
         - SarinhaCortez
+        - BernaJojo
+        - WotsM
 
-    #step 5
 
+    ###############################
+    # STEP 5 — DISABLE SWAP
+    ###############################
     - name: Disable SWAP
-      ansible.builtin.shell:
-        cmd: swapoff -a
+      ansible.builtin.command: swapoff -a
 
-    - name: Comment out SWAP line in /etc/fstab
+    - name: Remove swap entry in /etc/fstab
       ansible.builtin.lineinfile:
         path: /etc/fstab
-        regexp: 'swap'
+        regexp: '\bswap\b'
         state: absent
 
-    #step 6
-    - name: Create the .conf file to load modules at boot
+
+    ##########################################
+    # STEP 6 — ENABLE OVERLAY & BR_NETFILTER
+    ##########################################
+    - name: Create modules file
       ansible.builtin.copy:
         dest: /etc/modules-load.d/k8s.conf
         content: |
@@ -42,81 +53,97 @@
           br_netfilter
         mode: '0644'
 
-    - name: Load br_netfilter module into the running kernel
-      community.general.modprobe:
-        name: br_netfilter
-        state: present
-
-    - name: Load overlay module into the running kernel
+    - name: Load overlay module
       community.general.modprobe:
         name: overlay
         state: present
 
-    #step 7
-    - name: Enable IPv4 forwarding
-      ansible.builtin.sysctl:
-        name: net.ipv4.ip_forward
-        value: "1"
+    - name: Load br_netfilter module
+      community.general.modprobe:
+        name: br_netfilter
         state: present
-        reload: yes
 
-    - name: Send bridged traffic through iptables (IPv4)
-      ansible.builtin.sysctl:
-        name: net.bridge.bridge-nf-call-iptables
-        value: "1"
-        state: present
-        reload: yes
 
-    - name: Send bridged traffic through iptables (IPv6)
-      ansible.builtin.sysctl:
-        name: net.bridge.bridge-nf-call-ip6tables
-        value: "1"
-        state: present
-        reload: yes
-        
-    #step 8
-    - name: Update /etc/hosts with Master and Worker nodes
+    ##########################################
+    # STEP 7 — ENABLE SYSCTL SETTINGS
+    ##########################################
+    - name: Enable sysctl params
+      ansible.builtin.copy:
+        dest: /etc/sysctl.d/k8s.conf
+        content: |
+          net.bridge.bridge-nf-call-iptables = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward = 1
+        mode: '0644'
+
+    - name: Reload sysctl
+      ansible.builtin.command: sysctl --system
+
+
+    ##########################################
+    # STEP 8 — MANAGE /etc/hosts
+    ##########################################
+    - name: Update /etc/hosts
       ansible.builtin.blockinfile:
         path: /etc/hosts
-        create: true
         block: |
           192.168.56.100 ctrl
           192.168.56.101 node-1
           192.168.56.102 node-2
+        create: yes
 
-    #step 9
-    - name: Add Kubernetes official release repository and signing key
-      block:
-      - name: Download Kubernetes GPG key
-        ansible.builtin.get_url:
-          url: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
-          dest: /etc/apt/keyrings/kubernetes.gpg
-          mode: '0644'
 
-    - name: Add Kubernetes APT repository
+    ##########################################
+    # STEP 9 — ADD KUBERNETES REPOSITORY 
+    ##########################################
+    - name: Ensure keyrings directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Kubernetes GPG key
+      ansible.builtin.get_url:
+        url: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
+        dest: /etc/apt/keyrings/kubernetes-release.key
+        mode: '0644'
+
+    - name: Convert key to GPG format
+      ansible.builtin.command:
+        cmd: >
+          gpg --dearmor -o /etc/apt/keyrings/kubernetes.gpg
+          /etc/apt/keyrings/kubernetes-release.key
+      args:
+        creates: /etc/apt/keyrings/kubernetes.gpg
+
+    - name: Add Kubernetes apt repository
       ansible.builtin.apt_repository:
         repo: "deb [signed-by=/etc/apt/keyrings/kubernetes.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /"
         state: present
         filename: kubernetes
 
-    - name: Update APT cache
+    - name: Update apt cache
       ansible.builtin.apt:
         update_cache: yes
+
         
-    #step 10
+    ##########################################
+    # STEP 10 — ADD KUBERNETES REPOSITORY 
+    ##########################################
     - name: Install containerd and runc
       ansible.builtin.apt:
         name:
-          - containerd=1.7.24-1
-          - runc=1.1.12-1
+          - containerd=1.7.28-0ubuntu1~24.04.1
+          - runc=1.3.3-0ubuntu1~24.04.3
         state: present
         update_cache: yes
 
     - name: Install kubeadm, kubelet, and kubectl
       ansible.builtin.apt:
         name:
-          - kubeadm=1.32.4-00
-          - kubelet=1.32.4-00
-          - kubectl=1.32.4-00
+          - kubeadm=1.32.4-1.1
+          - kubelet=1.32.4-1.1
+          - kubectl=1.32.4-1.1
         state: present
         update_cache: yes
+        
