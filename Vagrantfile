@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
     ctrl.vm.provider "virtualbox" do |v|
       v.name = "ctrl"      
       v.memory = 4096       
-      v.cpus = 1
+      v.cpus = 2
     end
     ctrl.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "ansible/ctrl.yaml"
