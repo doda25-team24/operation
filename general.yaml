@@ -128,7 +128,7 @@
 
         
     ##########################################
-    # STEP 10 — ADD KUBERNETES REPOSITORY 
+    # STEP 10 — INSTALL K8S TOOLS
     ##########################################
     - name: Install containerd and runc
       ansible.builtin.apt:
@@ -146,7 +146,11 @@
           - kubectl=1.32.4-1.1
         state: present
         update_cache: yes
-       # step 11
+        
+    ##########################################
+    # STEP 11 — CONFIGURE CONTAINERD
+    ##########################################
+
     - name: Ensure containerd directory exists
       ansible.builtin.file:
         path: /etc/containerd
@@ -180,4 +184,18 @@
       ansible.builtin.service:
         name: containerd
         state: restarted
+
+    ##########################################
+    # STEP 12 — ENABLE AND START KUBELET
+    ##########################################
+    - name: Enable kubelet service
+      ansible.builtin.service:
+        name: kubelet
+        enabled: yes
+
+    - name: Start kubelet service
+      ansible.builtin.service:
+        name: kubelet
+        state: started
+
         
