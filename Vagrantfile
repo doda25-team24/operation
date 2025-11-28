@@ -14,6 +14,7 @@ Vagrant.configure("2") do |config|
       v.memory = 4096       
       v.cpus = 2
     end
+    ctrl.vm.synced_folder "./kubeconfig", "/home/vagrant/kubeconfig"
     ctrl.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "ansible/ctrl.yaml"
     end

@@ -1,1 +1,1 @@
-{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/saracortez/tudelft/dsait/Q2/DevOps/doda-org/operation","disabled":false,"__vagrantfile":true}}}
+{"virtualbox":{"/home/vagrant/kubeconfig":{"guestpath":"/home/vagrant/kubeconfig","hostpath":"/Users/saracortez/tudelft/dsait/Q2/DevOps/doda-org/operation/kubeconfig","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/saracortez/tudelft/dsait/Q2/DevOps/doda-org/operation","disabled":false,"__vagrantfile":true}}}
