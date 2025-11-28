@@ -71,3 +71,41 @@
         name: kubelet
         state: restarted
       when: not kube_admin_conf.stat.exists
+
+    - name: Ensure .kube directory exists for vagrant
+      ansible.builtin.file:
+        path: /home/vagrant/.kube
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: '0755'
+      when: not kube_admin_conf.stat.exists
+
+    - name: Copy admin.conf for vagrant kubectl usage
+      ansible.builtin.copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/vagrant/.kube/config
+        owner: vagrant
+        group: vagrant
+        mode: '0600'
+        remote_src: yes
+      when: not kube_admin_conf.stat.exists
+
+    # --- Setup kubectl for host machine via synced folder ---
+    - name: Ensure kubeconfig synced folder exists
+      ansible.builtin.file:
+        path: /home/vagrant/kubeconfig
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: '0755'
+
+    - name: Copy admin.conf to synced folder for host
+      ansible.builtin.copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/vagrant/kubeconfig/admin.conf
+        owner: vagrant
+        group: vagrant
+        mode: '0600'
+        remote_src: yes
+      when: not kube_admin_conf.stat.exists
