@@ -1,5 +1,73 @@
 ---
-- hosts: all
+- hosts: ctrl
+  become: yes
   tasks:
-    - name: Ping test
-      ping:
+
+    - name: Check if Kubernetes cluster is already initialized
+      ansible.builtin.stat:
+        path: /etc/kubernetes/admin.conf
+      register: kube_admin_conf
+
+    - name: Configure DNS resolver
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver 8.8.8.8
+          nameserver 8.8.4.4
+      when: not kube_admin_conf.stat.exists
+
+    - name: Test DNS resolution
+      ansible.builtin.command: nslookup registry.k8s.io
+      when: not kube_admin_conf.stat.exists
+      changed_when: false
+    - name: Initialize Kubernetes cluster with kubeadm
+      ansible.builtin.command: >
+        kubeadm init
+        --apiserver-advertise-address=192.168.56.100
+        --node-name ctrl
+        --pod-network-cidr=10.244.0.0/16
+      when: not kube_admin_conf.stat.exists
+      register: kubeadm_output
+
+    - name: Show kubeadm output
+      ansible.builtin.debug:
+        var: kubeadm_output.stdout_lines
+      when: not kube_admin_conf.stat.exists
+
+    - name: Ensure .kube directory exists for vagrant
+      ansible.builtin.file:
+        path: /home/vagrant/.kube
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: '0755'
+      when: not kube_admin_conf.stat.exists
+
+
+    - name: Copy admin.conf to vagrant kube config
+      ansible.builtin.copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/vagrant/.kube/config
+        remote_src: yes
+        owner: vagrant
+        group: vagrant
+        mode: '0600'
+      when: not kube_admin_conf.stat.exists
+
+    - name: Download Flannel manifest
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+        dest: /tmp/kube-flannel.yml
+      when: not kube_admin_conf.stat.exists
+
+    - name: Apply Flannel pod network
+      ansible.builtin.command: kubectl apply -f /tmp/kube-flannel.yml
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      when: not kube_admin_conf.stat.exists
+      
+    - name: Restart kubelet
+      ansible.builtin.service:
+        name: kubelet
+        state: restarted
+      when: not kube_admin_conf.stat.exists
