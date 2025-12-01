@@ -116,3 +116,47 @@
         mode: '0600'
         remote_src: yes
       when: not kube_admin_conf.stat.exists
+
+  # --- Helm Install ---
+
+    - name: Install Helm dependencies
+      apt:
+        name:
+          - curl
+          - gpg
+          - apt-transport-https
+        state: present
+        update_cache: yes
+      tags:
+        - helm
+
+    - name: Add Helm GPG key
+      apt_key:
+        url: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
+        state: present
+
+    - name: Add Helm apt repository
+      apt_repository:
+        repo: "deb https://packages.buildkite.com/helm-linux/helm-debian/any/ any main"
+        state: present
+
+    - name: Update apt cache after adding Helm repository
+      apt:
+        update_cache: yes
+
+    - name: Verify Helm install
+      apt:
+        name: helm
+        state: present
+
+    - name: Install helm-diff plugin
+      become: yes
+      become_user: vagrant
+      ansible.builtin.command:
+        cmd: helm plugin install https://github.com/databus23/helm-diff
+      args:
+        creates: /home/vagrant/.local/share/helm/plugins/helm-diff
+      environment:
+        HOME: /home/vagrant
+        PATH: /usr/local/bin:/usr/bin:/bin
+

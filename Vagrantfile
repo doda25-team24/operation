@@ -49,7 +49,7 @@ Vagrant.configure("2") do |config|
 
 	config.vm.provision :ansible do |a|
    		a.compatibility_mode = "2.0"
-   		a.playbook = "general.yaml"
+   		a.playbook = "ansible/general.yaml"
 	end
 
 end
