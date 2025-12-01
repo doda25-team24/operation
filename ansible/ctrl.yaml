@@ -56,7 +56,7 @@
 
     - name: Download Flannel manifest v0.26.7
       ansible.builtin.get_url:
-        url: https://github.com/flannel-io/flannel/releases/download/v0.26.7/kube-flannel-0.26.7.yml
+        url: https://github.com/flannel-io/flannel/releases/download/v0.26.7/kube-flannel.yml
         dest: /tmp/kube-flannel.yml
       when: not kube_admin_conf.stat.exists
 
@@ -116,3 +116,18 @@
         mode: '0600'
         remote_src: yes
       when: not kube_admin_conf.stat.exists
+
+    # step 16
+    - name: Install Helm
+      ansible.builtin.shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      args:
+        creates: /usr/local/bin/helm
+
+    #step 17
+    - name: Install Helm Diff Plugin
+      become_user: vagrant
+      ansible.builtin.command: helm plugin install https://github.com/databus23/helm-diff
+      args:
+        creates: /home/vagrant/.local/share/helm/plugins/helm-diff
+
+
