@@ -1,5 +1,22 @@
 ---
-- hosts: all
+- hosts: node-1,node-2
+  become: yes
   tasks:
-    - name: Ping test
-      ping:
+    
+    - name: Generate Kubernetes join command on controller
+      command: kubeadm token create --print-join-command
+      delegate_to: ctrl
+      run_once: true
+      register: join_command
+      changed_when: false
+
+    - name: Run Join Command
+      command: "{{ join_command.stdout }}"
+
+    ####################################################
+    # STEP 19 — Join the cluster (run on worker node)
+    ####################################################
+    - name: Join node to Kubernetes cluster
+      ansible.builtin.shell: "{{ join_command.stdout }} --ignore-preflight-errors=all"
+      args:
+        creates: /etc/kubernetes/kubelet.conf
