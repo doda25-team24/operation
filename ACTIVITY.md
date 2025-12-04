@@ -46,6 +46,7 @@ https://github.com/doda25-team24/model-service/pull/2
 
 https://github.com/doda25-team24/model-service/pull/3
 
+<<<<<<< HEAD
 
 
 ### WEEK 2 (Nov 17-21)
@@ -57,6 +58,8 @@ https://github.com/doda25-team24/model-service/pull/3
 - Mititelu, Alexandru:
 
 - Mundala, Wojciech:
+I have worked on steps 11-17 together during team meetings. I implemented step 15 myself:
+https://github.com/doda25-team24/operation/pull/10
 
 - de Oliveira Cortez, Sara:
 
