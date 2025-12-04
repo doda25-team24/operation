@@ -45,3 +45,9 @@ I have worked on A1 F9 and F10, workflows and making the code model independent 
 https://github.com/doda25-team24/model-service/pull/2
 
 https://github.com/doda25-team24/model-service/pull/3
+
+### WEEK 2 (Nov 10-14)
+
+- Mundala, Wojciech
+I have worked on steps 11-17 together during team meetings. I implemented step 15 myself:
+https://github.com/doda25-team24/operation/pull/10
