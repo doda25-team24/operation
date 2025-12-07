@@ -78,7 +78,7 @@ https://github.com/doda25-team24/operation/pull/9
 
 - Mititelu, Alexandru:
 
-- Mundala, Wojciech:
+- Mundala, Wojciech: Implemented steps 18 and 19. https://github.com/doda25-team24/operation/pull/13
 
 - de Oliveira Cortez, Sara:
 
