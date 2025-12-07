@@ -29,6 +29,13 @@ Vagrant.configure("2") do |config|
       v.memory = 6144       
       v.cpus = 2
     end
+    node.vm.provision "shell", inline: <<-SHELL
+      mkdir -p /home/vagrant/.ssh
+      cp /vagrant/.vagrant/machines/ctrl/virtualbox/private_key /home/vagrant/.ssh/ctrl_key
+      chmod 600 /home/vagrant/.ssh/ctrl_key
+      chown vagrant:vagrant /home/vagrant/.ssh/ctrl_key
+    SHELL
+
     node.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "ansible/node.yaml"
     end
@@ -42,6 +49,14 @@ Vagrant.configure("2") do |config|
       v.memory = 6144      
       v.cpus = 2
     end
+
+    node.vm.provision "shell", inline: <<-SHELL
+      mkdir -p /home/vagrant/.ssh
+      cp /vagrant/.vagrant/machines/ctrl/virtualbox/private_key /home/vagrant/.ssh/ctrl_key
+      chmod 600 /home/vagrant/.ssh/ctrl_key
+      chown vagrant:vagrant /home/vagrant/.ssh/ctrl_key
+    SHELL
+
     node.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "ansible/node.yaml"
     end

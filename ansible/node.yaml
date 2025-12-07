@@ -1,5 +1,28 @@
 ---
 - hosts: all
+  become: yes
   tasks:
-    - name: Ping test
-      ping:
+
+    # Step 18: Get join command from controller
+    - name: Check if worker already joined the cluster
+      ansible.builtin.stat:
+        path: /etc/kubernetes/kubelet.conf
+      register: kubelet_conf
+
+    - name: Fetch join command from controller
+      ansible.builtin.command: kubeadm token create --print-join-command
+      delegate_to: 192.168.56.100
+      register: join_cmd
+      when: not kubelet_conf.stat.exists
+      vars:
+        ansible_ssh_private_key_file: /home/vagrant/.ssh/ctrl_key
+        ansible_user: vagrant
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+
+
+    # Step 19: Join worker to cluster
+    - name: Join the Kubernetes cluster
+      ansible.builtin.shell: "{{ join_cmd.stdout }}"
+      args:
+        creates: /etc/kubernetes/kubelet.conf
+      when: not kubelet_conf.stat.exists #workers don’t ask for join command after they have already joined
