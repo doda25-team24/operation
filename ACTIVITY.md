@@ -78,8 +78,7 @@ https://github.com/doda25-team24/operation/pull/9
 - Bernardini, Giorgio:
 
 - Ibanez, Elena:
-I have researched steps 1 to 5, and I had some issues with my laptop. 
-Will create the pull requests next week (week 4). 
+I have researched how to do the Enable Monitoring and Alerting steps and I had to fix some issues I had with my laptop. 
 
 - Mititelu, Alexandru:
 
