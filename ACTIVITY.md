@@ -17,7 +17,8 @@ With the use of Gemini and/or ChatGPT I understood the syntax of the dockerfile 
 
 - Ibanez, Elena:
 
-Completed F6: (model-service) 192444afaae332561d0722d596090bf0158ce9e2 and (app) 49b0f25270370b6ae016a04df83a129739e761cf
+I have worked on F6 and F7. 
+I forgot to do a pull request for F6 but here's are the commits. 
 Completed F7: https://github.com/doda25-team24/operation/pull/4
 
 - Mititelu, Alexandru:
@@ -55,6 +56,8 @@ https://github.com/doda25-team24/model-service/pull/3
 
 - Ibanez, Elena:
 
+I have worked on steps 1 to 11 with Sara together from Sara's laptop.  
+
 - Mititelu, Alexandru:
 
 - Mundala, Wojciech:
@@ -75,6 +78,8 @@ https://github.com/doda25-team24/operation/pull/9
 - Bernardini, Giorgio:
 
 - Ibanez, Elena:
+I have researched steps 1 to 5, and I had some issues with my laptop. 
+Will create the pull requests next week (week 4). 
 
 - Mititelu, Alexandru:
 
