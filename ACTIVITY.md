@@ -47,8 +47,6 @@ https://github.com/doda25-team24/model-service/pull/2
 
 https://github.com/doda25-team24/model-service/pull/3
 
-<<<<<<< HEAD
-
 
 ### WEEK 2 (Nov 17-21)
 
@@ -76,6 +74,8 @@ https://github.com/doda25-team24/operation/pull/9
 ### WEEK 3 (Nov 24-28)
 
 - Bernardini, Giorgio:
+Fixed steps 15, 16 and 17 together with Sara.
+https://github.com/doda25-team24/operation/pull/12
 
 - Ibanez, Elena:
 I have researched how to do the Enable Monitoring and Alerting steps and I had to fix some issues I had with my laptop. 
@@ -85,4 +85,7 @@ I have researched how to do the Enable Monitoring and Alerting steps and I had t
 - Mundala, Wojciech: Implemented steps 18 and 19. https://github.com/doda25-team24/operation/pull/13
 
 - de Oliveira Cortez, Sara:
+Fixed steps 15, 16 and 17 together with Giorgio.
+https://github.com/doda25-team24/operation/pull/12
+
 
