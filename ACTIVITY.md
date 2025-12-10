@@ -111,3 +111,14 @@ Fixed steps 15, 16 and 17 together with Giorgio.
 https://github.com/doda25-team24/operation/pull/12
 
 
+### WEEK 5 (Dec 8-12)
+
+- Ibanez, Elena:
+
+- Mititelu, Alexandru:
+
+- Mundala, Wojciech: 
+
+- de Oliveira Cortez, Sara:
+https://github.com/doda25-team24/operation/pull/14
+
