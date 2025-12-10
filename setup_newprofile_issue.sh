@@ -1,0 +1,47 @@
+#!/bin/bash
+# Script for Minikube newprofile setup, issue that happened on the mac of one of the team members(Sara Cortez)
+#builds on local minikube, not on A2
+
+PROFILE="newprofile"
+
+
+echo "Starting Minikube with profile '$PROFILE'..."
+minikube start -p $PROFILE --driver=docker --memory=4600MB --cpus=2 --bootstrapper=kubeadm
+
+# run this every time you open a new terminal
+echo "Setting Docker environment for Minikube..."
+eval $(minikube -p $PROFILE docker-env)
+
+echo "Building Docker images..."
+docker build -t sms-model-service:latest -f ../model-service/Dockerfile ../model-service
+docker build -t sms-checker-app:latest -f ../app/Dockerfile ../app
+
+#i did not need to load images into minikube w newprofile on my mac, but if you do, uncomment below
+# echo "Loading images into Minikube..."
+# minikube -p $PROFILE image load sms-model-service:latest
+# minikube -p $PROFILE image load sms-checker-app:latest
+
+echo "Mounting shared folder..."
+nohup minikube  -p $PROFILE mount ../model-service/output:/model-service/output > /tmp/minikube-mount.log 2>&1 & 
+
+echo "Deploying Helm chart..."
+helm install sms-checker ./sms-checker-chart \
+  -f env.yaml \
+  --set secret.SMTP_USER=myuser \
+  --set secret.SMTP_PASSWORD=mypassword
+
+
+echo "helm list:"
+helm list
+
+echo "Waiting for pods to be ready..."
+kubectl --context=$PROFILE get pods
+
+echo "Waiting for svc to be ready..."
+kubectl --context=$PROFILE get svc 
+
+echo "Waiting for pvc to be ready..."
+kubectl --context=$PROFILE get pvc
+
+echo "Waiting for pv to be ready..."
+kubectl --context=$PROFILE get pv

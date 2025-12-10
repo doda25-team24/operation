@@ -1,0 +1,21 @@
+appVersion: "0.0.0"
+
+secret:
+  smtpUser: "placeholder_env_matters"
+  smtpPassword: "placeholder_env_matters"
+
+config:
+  appPort: 8080
+  modelHost: "http://model-service:8081"
+
+modelService:
+  image: "sms-model-service:latest"
+  port: 8081
+  storage:
+    size: "1Gi"       # adjust if needed
+    mountPath: "/model-service/output"
+
+app:
+  image: "sms-checker-app:latest"
+  port: 8080
+  modelHost: "http://model-service:8081"
