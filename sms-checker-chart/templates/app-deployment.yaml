@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sms-checker-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sms-checker-app
+  template:
+    metadata:
+      labels:
+        app: sms-checker-app
+    spec:
+      containers:
+        - name: sms-checker-app
+          image: {{ .Values.app.image }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: APP_PORT
+              value: "{{ .Values.app.port }}"
+            - name: MODEL_HOST
+              value: "{{ .Values.app.modelHost }}"
+          envFrom:                    
+            - configMapRef:
+                name: sms-checker-config
+            - secretRef:
+                name: sms-checker-secret
+          ports:
+            - containerPort: {{ .Values.app.port }}

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-service
+  template:
+    metadata:
+      labels:
+        app: model-service
+    spec:
+      containers:
+        - name: model-service
+          image: {{ .Values.modelService.image }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MODEL_PORT
+              value: "{{ .Values.modelService.port }}"
+          envFrom:                    
+            - configMapRef:
+                name: sms-checker-config
+            - secretRef:
+                name: sms-checker-secret
+          ports:
+            - containerPort: {{ .Values.modelService.port }}
+          volumeMounts:
+            - name: model-storage
+              mountPath: {{ .Values.modelService.storage.mountPath }}
+      volumes:
+      - name: model-storage
+        hostPath:
+            path: /model-service/output      
+            type: Directory
+
