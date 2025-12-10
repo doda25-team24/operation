@@ -23,6 +23,7 @@ Completed F7: https://github.com/doda25-team24/operation/pull/4
 
 - Mititelu, Alexandru:
 I have worked on F2, F8 and F11. Here's the pull requests:
+
 ### F2 and F11: Versioning & Release Automation
 https://github.com/doda25-team24/lib-version/commit/cf2520c17259c2e55559630ebb7f62e8cfacd02c
 
@@ -64,11 +65,12 @@ https://github.com/doda25-team24/operation/pull/10
 
 - de Oliveira Cortez, Sara:
 
-I have worked on steps 1 to 14:
-https://github.com/doda25-team24/operation/commit/24bb522aabc5291964e6fb80f2166eabe0b4a706 (collaborative, accidentally unfortunately directly commited to main)
-https://github.com/doda25-team24/operation/pull/6
-https://github.com/doda25-team24/operation/pull/8
-https://github.com/doda25-team24/operation/pull/9
+I have worked on A1 F9 and F10, workflows and making the code model independent through envIronment variables.
+
+https://github.com/doda25-team24/model-service/pull/2
+
+https://github.com/doda25-team24/model-service/pull/3
+
 
 
 ### WEEK 3 (Nov 24-28)
@@ -83,6 +85,26 @@ I have researched how to do the Enable Monitoring and Alerting steps and I had t
 - Mititelu, Alexandru:
 
 - Mundala, Wojciech: Implemented steps 18 and 19. https://github.com/doda25-team24/operation/pull/13
+
+- de Oliveira Cortez, Sara:
+  
+I have worked on steps 1 to 14:
+https://github.com/doda25-team24/operation/commit/24bb522aabc5291964e6fb80f2166eabe0b4a706 (collaborative, accidentally unfortunately directly commited to main)
+https://github.com/doda25-team24/operation/pull/6
+https://github.com/doda25-team24/operation/pull/8
+https://github.com/doda25-team24/operation/pull/9
+
+### WEEK 4 (Dec 1-5)
+
+- Bernardini, Giorgio:
+Fixed steps 15, 16 and 17 together with Sara.
+https://github.com/doda25-team24/operation/pull/12
+
+- Ibanez, Elena:
+
+- Mititelu, Alexandru:
+
+- Mundala, Wojciech: 
 
 - de Oliveira Cortez, Sara:
 Fixed steps 15, 16 and 17 together with Giorgio.
