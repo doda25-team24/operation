@@ -1,0 +1,77 @@
+- hosts: all
+  become: yes
+  tasks:
+
+  # Run with: 
+  # ansible-playbook -u vagrant --private-key=../.vagrant/machines/ctrl/virtualbox/private_key -i 192.168.56.100, finalization.yml
+  
+  - name: Ensure .kube directory exists
+    file:
+      path: /home/vagrant/.kube
+      state: directory
+      owner: vagrant
+      group: vagrant
+      mode: '0755'
+
+  # Copy the kubeconfig here
+  - name: Copy kubeconfig from cluster's admin.conf
+    become: yes
+    copy:
+      remote_src: yes
+      src: /etc/kubernetes/admin.conf
+      dest: /home/vagrant/.kube/config
+      owner: vagrant
+      group: vagrant
+      mode: 0600
+
+
+  # Step: Install MetalLB
+  - name: Wait for MetalLB controller to be ready
+    command: >
+      kubectl wait -n metallb-system -l app=metallb,component=controller
+      --for=condition=ready pod --timeout=60s
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+    retries: 3
+    delay: 10
+    register: metallb_wait
+    until: metallb_wait.rc == 0
+
+  # Step: Configure MetalLB IPAddressPool
+  - name: Create MetalLB IPAddressPool
+    copy:
+      dest: /tmp/metallb-pool.yaml
+      content: |
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        metadata:
+          name: default-pool
+          namespace: metallb-system
+        spec:
+          addresses:
+          - 192.168.56.99-192.168.56.199
+
+  - name: Apply IPAddressPool
+    command: kubectl apply -f /tmp/metallb-pool.yaml
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+
+
+  # Step: Configure L2Advertisement
+  - name: Create L2Advertisement
+    copy:
+      dest: /tmp/metallb-l2.yaml
+      content: |
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        metadata:
+          name: l2config
+          namespace: metallb-system
+        spec:
+          ipAddressPools:
+          - default-pool
+
+  - name: Apply L2Advertisement
+    command: kubectl apply -f /tmp/metallb-l2.yaml
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
