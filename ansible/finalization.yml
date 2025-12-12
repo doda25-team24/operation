@@ -95,6 +95,67 @@
   - name: Install ingress-nginx
     become: false
     command: >
-      helm install ingress-nginx ingress-nginx/ingress-nginx
+      helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx
       --namespace ingress-nginx --create-namespace
       --set controller.service.loadBalancerIP=192.168.56.110
+
+
+  # Step 23: Install istio
+  - name: Download Istio 1.25.2
+    get_url:
+      url: https://github.com/istio/istio/releases/download/1.25.2/istio-1.25.2-linux-amd64.tar.gz
+      dest: /tmp/istio-1.25.2.tar.gz
+
+  - name: Unpack Istio
+    unarchive:
+      src: /tmp/istio-1.25.2.tar.gz
+      dest: /home/vagrant/
+      remote_src: yes
+
+  - name: Add istioctl to PATH
+    lineinfile:
+      path: /home/vagrant/.bashrc
+      line: 'export PATH=/home/vagrant/istio-1.25.2/bin:$PATH'
+      create: yes
+
+  # Step: Create IstioOperator custom config
+  - name: Create IstioOperator configuration for loadBalancerIP
+    copy:
+      dest: /tmp/istio-operator.yaml
+      content: |
+        apiVersion: install.istio.io/v1alpha1
+        kind: IstioOperator
+        metadata:
+          name: istio-control-plane
+          namespace: istio-system
+        spec:
+          profile: default
+          components:
+            ingressGateways:
+              - name: istio-ingressgateway
+                enabled: true
+                k8s:
+                  serviceAnnotations:
+                    metallb.universe.tf/address-pool: default-pool
+                  service:
+                    type: LoadBalancer
+                    loadBalancerIP: 192.168.56.120
+
+  # Step: Install Istio using the operator file
+  - name: Install Istio with custom IstioOperator
+    command: >
+      /home/vagrant/istio-1.25.2/bin/istioctl install -y -f /tmp/istio-operator.yaml
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+
+  # Step: Wait for Istio ingress gateway to be ready
+  - name: Wait for Istio ingressgateway to be ready
+    command: >
+      kubectl wait -n istio-system -l app=istio-ingressgateway
+      --for=condition=ready pod --timeout=120s
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+    retries: 5
+    delay: 15
+    register: istio_wait
+    until: istio_wait.rc == 0
