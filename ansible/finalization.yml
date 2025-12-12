@@ -99,11 +99,144 @@
       --namespace ingress-nginx --create-namespace
       --set controller.service.loadBalancerIP=192.168.56.110
 
+  # Step 22: Install Kubernetes Dashboard
+  - name: Wait for ingress-nginx controller to be ready
+    command: >
+      kubectl wait -n ingress-nginx
+      --for=condition=ready pod
+      --timeout=180s
+      -l app.kubernetes.io/component=controller
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+    retries: 3
+    delay: 10
+    register: ingress_wait
+    until: ingress_wait.rc == 0
+
+  - name: Add kubernetes-dashboard Helm repo
+    become: false
+    command: helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+    ignore_errors: yes
+
+  - name: Update helm repos (again)
+    become: false
+    command: helm repo update
+
+  - name: Install/upgrade kubernetes-dashboard
+    become: false
+    command: >
+      helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard
+      --namespace kubernetes-dashboard --create-namespace
+
+  - name: Wait for dashboard pods to be ready
+    command: >
+      kubectl wait -n kubernetes-dashboard
+      --for=condition=ready pod
+      --timeout=180s
+      -l app.kubernetes.io/part-of=kubernetes-dashboard
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+    retries: 3
+    delay: 10
+    register: dash_wait
+    until: dash_wait.rc == 0
+
+  # Step: Create admin-user (ServiceAccount + ClusterRoleBinding)
+  - name: Create dashboard admin-user manifest
+    copy:
+      dest: /tmp/dashboard-admin-user.yaml
+      content: |
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: admin-user
+          namespace: kubernetes-dashboard
+        ---
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: admin-user
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: cluster-admin
+        subjects:
+        - kind: ServiceAccount
+          name: admin-user
+          namespace: kubernetes-dashboard
+
+  - name: Apply dashboard admin-user RBAC
+    command: kubectl apply -f /tmp/dashboard-admin-user.yaml
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+
+  # Step: Expose dashboard with Ingress (dashboard.local)
+  - name: Create dashboard ingress manifest
+    copy:
+      dest: /tmp/dashboard-ingress.yaml
+      content: |
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        metadata:
+          name: kubernetes-dashboard
+          namespace: kubernetes-dashboard
+          annotations:
+            nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        spec:
+          ingressClassName: nginx
+          rules:
+          - host: dashboard.local
+            http:
+              paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: kubernetes-dashboard-kong-proxy
+                    port:
+                      number: 443
+
+  - name: Apply dashboard ingress
+    command: kubectl apply -f /tmp/dashboard-ingress.yaml
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+
+  - name: Create self-signed TLS cert for dashboard.local
+    command: >
+      openssl req -x509 -nodes -days 365 -newkey rsa:2048
+      -keyout /tmp/dashboard.key -out /tmp/dashboard.crt
+      -subj "/CN=dashboard.local"
+      -addext "subjectAltName=DNS:dashboard.local"
+    args:
+      creates: /tmp/dashboard.crt
+
+  - name: Create/Update TLS secret for dashboard ingress
+    shell: |
+      kubectl -n kubernetes-dashboard create secret tls dashboard-tls \
+        --cert=/tmp/dashboard.crt --key=/tmp/dashboard.key \
+        --dry-run=client -o yaml | kubectl apply -f -
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+
+  - name: Patch dashboard ingress to enable TLS
+    command: >
+      kubectl -n kubernetes-dashboard patch ingress kubernetes-dashboard --type merge -p
+      '{"spec":{"tls":[{"hosts":["dashboard.local"],"secretName":"dashboard-tls"}]}}'
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
 
   # Step 23: Install istio
-  - name: Download Istio 1.25.2
+  - name: Detect VM architecture
+    command: uname -m
+    register: arch
+
+  - name: Set Istio arch name
+    set_fact:
+      istio_arch: "{{ 'arm64' if arch.stdout in ['aarch64', 'arm64'] else 'amd64' }}"
+
+  - name: Download Istio 1.25.2 (correct arch)
     get_url:
-      url: https://github.com/istio/istio/releases/download/1.25.2/istio-1.25.2-linux-amd64.tar.gz
+      url: "https://github.com/istio/istio/releases/download/1.25.2/istio-1.25.2-linux-{{ istio_arch }}.tar.gz"
       dest: /tmp/istio-1.25.2.tar.gz
 
   - name: Unpack Istio
