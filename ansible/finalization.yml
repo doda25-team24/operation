@@ -128,7 +128,7 @@
     register: dash_wait
     until: dash_wait.rc == 0
 
-  # Step 22: Create admin-user (ServiceAccount + ClusterRoleBinding)
+  # Step: Create admin-user (ServiceAccount + ClusterRoleBinding)
   - name: Create dashboard admin-user manifest
     copy:
       dest: /tmp/dashboard-admin-user.yaml
@@ -157,7 +157,7 @@
     environment:
       KUBECONFIG: /home/vagrant/.kube/config
 
-  # Step 22: Expose dashboard with Ingress (dashboard.local)
+  # Step: Expose dashboard with Ingress (dashboard.local)
   - name: Create dashboard ingress manifest
     copy:
       dest: /tmp/dashboard-ingress.yaml
