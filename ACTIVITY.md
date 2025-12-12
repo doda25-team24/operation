@@ -80,7 +80,6 @@ Fixed steps 15, 16 and 17 together with Sara.
 https://github.com/doda25-team24/operation/pull/12
 
 - Ibanez, Elena:
-I have researched how to do the Enable Monitoring and Alerting steps and I had to fix some issues I had with my laptop. 
 
 - Mititelu, Alexandru:
 
@@ -114,6 +113,7 @@ https://github.com/doda25-team24/operation/pull/12
 ### WEEK 5 (Dec 8-12)
 
 - Ibanez, Elena:
+https://github.com/doda25-team24/operation/pull/19
 
 - Mititelu, Alexandru:
 
