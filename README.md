@@ -7,7 +7,7 @@ The system consists of two services:
 - **`model-service`** – Python / Flask service that exposes the SMS spam detection model.
 - **`app`** – Java / Spring Boot frontend that serves the web UI and calls the backend.
 
-The actual source code lives in separate repositories in the `doda25-team24` GitHub organization and as sibling folders in your local checkout:
+The actual source code lives in separate repositories in the `doda25-team24` GitHub organization and as sibling folders in the local checkout:
 
 - `../app` – Spring Boot frontend  
 - `../model-service` – Python model backend  
@@ -61,7 +61,7 @@ docker compose up -d
 
 Once both services are up:
 
-- Open the frontend in your browser:  
+- Open the frontend in the browser:  
   **http://localhost:8080/sms**
 
 - The backend (model-service) is reachable inside the Docker network as:  
@@ -162,3 +162,136 @@ URL of the model-service as seen from the app container.
 By default: `http://model-service:8081`, using the Docker Compose service name (`model-service`) and its internal port.
 
 To run the app on a different port (e.g., 9090) you can change both the environment variable and the port mapping in `docker-compose.yml`.
+
+## Provisioning
+
+To set up the infrastructure for this project, use Vagrant to provision the required virtual machines:
+
+```bash
+vagrant up
+vagrant provision
+```
+
+These commands will create and configure the VMs according to the specifications in the Vagrantfile, and apply the Ansible playbooks to set up the Kubernetes cluster.
+
+### Project Structure
+
+Here's an overview of the provisioning-related files and directories:
+
+```
+├── Vagrantfile              # VM configuration and provisioning settings
+├── ansible/                 # Ansible playbooks and configuration
+│   ├── ctrl.yaml           # Control plane node configuration
+│   ├── files/              # Static files for provisioning
+│   ├── finalization.yml    # Final setup tasks
+│   ├── hosts               # Ansible inventory file
+│   ├── kubeconfig/         # Kubernetes configuration directory
+│   │   └── admin.conf      # Cluster admin credentials
+│   └── node.yaml           # Worker node configuration
+├── docker-compose.yml       # Docker Compose configuration (if needed)
+├── env.yaml                 # Environment variables for Helm
+├── general.yaml             # General configuration settings
+├── kubeconfig/              # Local kubeconfig directory
+│   └── admin.conf          # Local copy of admin credentials
+└── requirements.txt         # Python dependencies
+```
+
+**Key Components:**
+- **Vagrantfile**: Defines the VMs (control plane and worker nodes)
+- **ansible/**: Contains all Ansible playbooks that configure Kubernetes on the VMs
+  - `ctrl.yaml`: Sets up the control plane node
+  - `node.yaml`: Configures worker nodes
+  - `finalization.yml`: Performs final cluster setup tasks
+- **kubeconfig/**: Stores Kubernetes cluster access credentials
+- **env.yaml**: Contains environment-specific variables for the Helm deployment
+
+## Running the Helm Chart
+
+Once the infrastructure is provisioned, deploy the application using Helm. Follow these steps in order:
+
+### 1. Start Minikube
+
+```bash
+minikube start --driver=docker --memory=4600MB --cpus=2 --bootstrapper=kubeadm
+```
+
+This initializes a local Kubernetes cluster with 4.6GB of memory and 2 CPUs.
+
+### 2. Configure Docker Environment
+
+```bash
+eval $(minikube docker-env)
+```
+
+This configures the shell to use Minikube's Docker daemon, allowing you to build images directly inside the cluster.
+
+### 3. Build Docker Images
+
+```bash
+docker build -t sms-model-service:latest -f ../model-service/Dockerfile ../model-service
+docker build -t sms-checker-app:latest -f ../app/Dockerfile ../app
+```
+
+
+### 3. b.(Optional) Load Images into Minikube
+
+If your images aren't appearing in the cluster after building, explicitly load them:
+
+```bash
+minikube image load sms-model-service:latest
+minikube image load sms-checker-app:latest
+```
+
+**Note:** This step may not be necessary on macOS when using `eval $(minikube docker-env)`, but is required on some systems or when using different Minikube profiles.
+
+
+Builds both the model service and the application images from their respective Dockerfiles.
+
+### 4. Mount Shared Folder
+
+```bash
+nohup minikube mount ../model-service/output:/model-service/output > /tmp/minikube-mount.log 2>&1 &
+```
+
+This mounts the local `model-service/output` directory into the Minikube VM, allowing persistent data storage between the host and the cluster. The process runs in the background.
+
+### 5. Deploy with Helm
+
+```bash
+helm install sms-checker ./sms-checker-chart \
+  -f env.yaml \
+  --set secret.SMTP_USER=myuser \
+  --set secret.SMTP_PASSWORD=mypassword
+```
+
+**Replace** `myuser` and `mypassword` with your actual SMTP credentials.
+
+This deploys the application using the Helm chart, applying the environment variables from `env.yaml` and the SMTP credentials you provide.
+
+### 6. Verify Deployment
+
+Check that all resources are created and running:
+
+```bash
+# List Helm releases
+helm list
+
+# Check pod status
+kubectl get pods
+
+# Check services
+kubectl get svc
+
+# Check persistent volume claims
+kubectl get pvc
+
+# Check persistent volumes
+kubectl get pv
+```
+
+Wait for all pods to reach the `Running` state before accessing the application. You can watch the pod status in real-time with:
+
+```bash
+kubectl get pods -w
+````
+
