@@ -7,7 +7,7 @@ The system consists of two services:
 - **`model-service`** – Python / Flask service that exposes the SMS spam detection model.
 - **`app`** – Java / Spring Boot frontend that serves the web UI and calls the backend.
 
-The actual source code lives in separate repositories in the `doda25-team24` GitHub organization and as sibling folders in your local checkout:
+The actual source code lives in separate repositories in the `doda25-team24` GitHub organization and as sibling folders in the local checkout:
 
 - `../app` – Spring Boot frontend  
 - `../model-service` – Python model backend  
@@ -61,7 +61,7 @@ docker compose up -d
 
 Once both services are up:
 
-- Open the frontend in your browser:  
+- Open the frontend in the browser:  
   **http://localhost:8080/sms**
 
 - The backend (model-service) is reachable inside the Docker network as:  
@@ -172,7 +172,7 @@ vagrant up
 vagrant provision
 ```
 
-These commands will create and configure the VMs according to the specifications in your Vagrantfile, and apply the Ansible playbooks to set up your Kubernetes cluster.
+These commands will create and configure the VMs according to the specifications in the Vagrantfile, and apply the Ansible playbooks to set up the Kubernetes cluster.
 
 ### Project Structure
 
@@ -197,17 +197,17 @@ Here's an overview of the provisioning-related files and directories:
 ```
 
 **Key Components:**
-- **Vagrantfile**: Defines your VMs (control plane and worker nodes)
+- **Vagrantfile**: Defines the VMs (control plane and worker nodes)
 - **ansible/**: Contains all Ansible playbooks that configure Kubernetes on the VMs
   - `ctrl.yaml`: Sets up the control plane node
   - `node.yaml`: Configures worker nodes
   - `finalization.yml`: Performs final cluster setup tasks
 - **kubeconfig/**: Stores Kubernetes cluster access credentials
-- **env.yaml**: Contains environment-specific variables for your Helm deployment
+- **env.yaml**: Contains environment-specific variables for the Helm deployment
 
 ## Running the Helm Chart
 
-Once your infrastructure is provisioned, deploy the application using Helm. Follow these steps in order:
+Once the infrastructure is provisioned, deploy the application using Helm. Follow these steps in order:
 
 ### 1. Start Minikube
 
@@ -223,7 +223,7 @@ This initializes a local Kubernetes cluster with 4.6GB of memory and 2 CPUs.
 eval $(minikube docker-env)
 ```
 
-This configures your shell to use Minikube's Docker daemon, allowing you to build images directly inside the cluster.
+This configures the shell to use Minikube's Docker daemon, allowing you to build images directly inside the cluster.
 
 ### 3. Build Docker Images
 
@@ -240,7 +240,7 @@ Builds both the model service and the application images from their respective D
 nohup minikube mount ../model-service/output:/model-service/output > /tmp/minikube-mount.log 2>&1 &
 ```
 
-This mounts your local `model-service/output` directory into the Minikube VM, allowing persistent data storage between your host and the cluster. The process runs in the background.
+This mounts the local `model-service/output` directory into the Minikube VM, allowing persistent data storage between the host and the cluster. The process runs in the background.
 
 ### 5. Deploy with Helm
 
@@ -251,9 +251,9 @@ helm install sms-checker ./sms-checker-chart \
   --set secret.SMTP_PASSWORD=mypassword
 ```
 
-**Replace** `myuser` and `mypassword` with your actual SMTP credentials.
+**Replace** `myuser` and `mypassword` with the actual SMTP credentials.
 
-This deploys your application using the Helm chart, applying the environment variables from `env.yaml` and the SMTP credentials you provide.
+This deploys the application using the Helm chart, applying the environment variables from `env.yaml` and the SMTP credentials you provide.
 
 ### 6. Verify Deployment
 
@@ -276,7 +276,7 @@ kubectl get pvc
 kubectl get pv
 ```
 
-Wait for all pods to reach the `Running` state before accessing your application. You can watch the pod status in real-time with:
+Wait for all pods to reach the `Running` state before accessing the application. You can watch the pod status in real-time with:
 
 ```bash
 kubectl get pods -w
