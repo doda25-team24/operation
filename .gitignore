@@ -2,3 +2,4 @@
 .vagrant
 venv
 ./.vagrant
+kubeconfig/admin.conf
