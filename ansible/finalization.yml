@@ -26,6 +26,12 @@
 
 
   # Step: Install MetalLB
+  - name: Install MetalLB
+    command: >
+      kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+        
   - name: Wait for MetalLB controller to be ready
     command: >
       kubectl wait -n metallb-system -l app=metallb,component=controller
@@ -75,3 +81,20 @@
     command: kubectl apply -f /tmp/metallb-l2.yaml
     environment:
       KUBECONFIG: /home/vagrant/.kube/config
+
+  # Step 21: Install ingress controller
+  - name: Add ingress-nginx Helm repo
+    become: false
+    command: helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    ignore_errors: yes
+
+  - name: Update helm repos
+    become: false
+    command: helm repo update
+
+  - name: Install ingress-nginx
+    become: false
+    command: >
+      helm install ingress-nginx ingress-nginx/ingress-nginx
+      --namespace ingress-nginx --create-namespace
+      --set controller.service.loadBalancerIP=192.168.56.110
