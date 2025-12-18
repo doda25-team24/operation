@@ -34,7 +34,10 @@ helm install sms-checker ./sms-checker-chart \
 echo "helm list:"
 helm list
 
+echo "Starting a 30 second wait to ensure pods are running...... "; sleep 30; echo "Wait finished!"
+
 echo "Waiting for pods to be ready..."
+
 kubectl --context=$PROFILE get pods
 
 echo "Waiting for svc to be ready..."

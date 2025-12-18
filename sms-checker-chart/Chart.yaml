@@ -4,3 +4,4 @@ description: Minimal chart for model-service and app
 type: application
 version: 1.0.0
 appVersion: "{{ .Values.appVersion }}"
+
