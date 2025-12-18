@@ -125,3 +125,10 @@ https://github.com/doda25-team24/operation/pull/17
 - de Oliveira Cortez, Sara:
 https://github.com/doda25-team24/operation/pull/14
 
+### WEEK 5 (Dec 15-19)
+
+- de Oliveira Cortez, Sara:
+Updated helm chart with service monitors, updated setup.sh to install prometheus. Troubleshooting minikube/macOS issues.
+https://github.com/doda25-team24/operation/pull/20
+
+
