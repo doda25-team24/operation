@@ -19,3 +19,6 @@ app:
   image: "sms-checker-app:latest"
   port: 8080
   modelHost: "http://model-service:8081"
+
+ingress:
+  enabled: true
