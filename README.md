@@ -232,6 +232,19 @@ docker build -t sms-model-service:latest -f ../model-service/Dockerfile ../model
 docker build -t sms-checker-app:latest -f ../app/Dockerfile ../app
 ```
 
+
+### 3. b.(Optional) Load Images into Minikube
+
+If your images aren't appearing in the cluster after building, explicitly load them:
+
+```bash
+minikube image load sms-model-service:latest
+minikube image load sms-checker-app:latest
+```
+
+**Note:** This step may not be necessary on macOS when using `eval $(minikube docker-env)`, but is required on some systems or when using different Minikube profiles.
+
+
 Builds both the model service and the application images from their respective Dockerfiles.
 
 ### 4. Mount Shared Folder
@@ -251,7 +264,7 @@ helm install sms-checker ./sms-checker-chart \
   --set secret.SMTP_PASSWORD=mypassword
 ```
 
-**Replace** `myuser` and `mypassword` with the actual SMTP credentials.
+**Replace** `myuser` and `mypassword` with your actual SMTP credentials.
 
 This deploys the application using the Helm chart, applying the environment variables from `env.yaml` and the SMTP credentials you provide.
 
@@ -281,9 +294,8 @@ Wait for all pods to reach the `Running` state before accessing the application.
 ```bash
 kubectl get pods -w
 ```
-
-
 Check that all resources are created and running:
+
 
 ```bash
 # List Helm releases
