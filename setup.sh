@@ -3,6 +3,7 @@
 
 echo "Starting default Minikube..."
 minikube start --driver=docker --memory=4600MB --cpus=2 --bootstrapper=kubeadm
+minikube addons enable ingress
 
 echo "Setting Docker environment for Minikube..."
 eval $(minikube docker-env)
@@ -15,6 +16,10 @@ docker build -t sms-checker-app:latest -f ../app/Dockerfile ../app
 # echo "Loading images into Minikube..."
 # minikube image load sms-model-service:latest
 # minikube image load sms-checker-app:latest
+
+echo "install prometheus"
+helm repo add prom-repo https://prometheus-community.github.io/helm-charts
+helm install myprom prom-repo/kube-prometheus-stack
 
 echo "Mounting shared folder..."
 nohup minikube mount ../model-service/output:/model-service/output > /tmp/minikube-mount.log 2>&1 & 
@@ -29,6 +34,8 @@ helm install sms-checker ./sms-checker-chart \
 echo "helm list:"
 helm list
 
+echo "Starting a 30 second wait to ensure pods are running...... "; sleep 30; echo "Wait finished!"
+
 echo "Waiting for pods to be ready..."
 kubectl get pods
 
@@ -40,3 +47,4 @@ kubectl get pvc
 
 echo "Waiting for pv to be ready..."
 kubectl get pv
+

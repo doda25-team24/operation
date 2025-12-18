@@ -3,12 +3,13 @@ kind: ServiceMonitor
 metadata:
   name: sms-checker-app
   labels:
-    release: myprom        # Must match Prometheus release
+    release: myprom       
 spec:
   selector:
     matchLabels:
       app: sms-checker-app
   endpoints:
     - port: http
-      path: /actuator/prometheus
+      path: /metrics
       interval: 15s
+

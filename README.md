@@ -281,3 +281,40 @@ Wait for all pods to reach the `Running` state before accessing the application.
 ```bash
 kubectl get pods -w
 ```
+
+
+Check that all resources are created and running:
+
+```bash
+# List Helm releases
+helm list
+
+# Check pod status
+kubectl get pods
+
+# Check services
+kubectl get svc
+
+# Check persistent volume claims
+kubectl get pvc
+
+# Check persistent volumes
+kubectl get pv
+```
+
+Wait for all pods to reach the `Running` state before accessing the application. You can watch the pod status in real-time with:
+
+```bash
+kubectl get pods -w
+```
+
+
+### 7. Monitoring - Gather metrics
+
+Using prometheus are gathering metrics for model-service.
+After running helm install, they should be available by running the command
+
+```bash
+curl http://127.0.0.1:8081/metrics/model-service
+```
+
