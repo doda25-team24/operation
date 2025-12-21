@@ -100,6 +100,19 @@
       --set controller.service.loadBalancerIP=192.168.56.110
 
   # Step 22: Install Kubernetes Dashboard
+  - name: Wait for ingress-nginx controller to be ready
+    command: >
+      kubectl wait -n ingress-nginx
+      --for=condition=ready pod
+      --timeout=180s
+      -l app.kubernetes.io/component=controller
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+    retries: 3
+    delay: 10
+    register: ingress_wait
+    until: ingress_wait.rc == 0
+
   - name: Add kubernetes-dashboard Helm repo
     become: false
     command: helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
@@ -188,10 +201,42 @@
     environment:
       KUBECONFIG: /home/vagrant/.kube/config
 
+  - name: Create self-signed TLS cert for dashboard.local
+    command: >
+      openssl req -x509 -nodes -days 365 -newkey rsa:2048
+      -keyout /tmp/dashboard.key -out /tmp/dashboard.crt
+      -subj "/CN=dashboard.local"
+      -addext "subjectAltName=DNS:dashboard.local"
+    args:
+      creates: /tmp/dashboard.crt
+
+  - name: Create/Update TLS secret for dashboard ingress
+    shell: |
+      kubectl -n kubernetes-dashboard create secret tls dashboard-tls \
+        --cert=/tmp/dashboard.crt --key=/tmp/dashboard.key \
+        --dry-run=client -o yaml | kubectl apply -f -
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+
+  - name: Patch dashboard ingress to enable TLS
+    command: >
+      kubectl -n kubernetes-dashboard patch ingress kubernetes-dashboard --type merge -p
+      '{"spec":{"tls":[{"hosts":["dashboard.local"],"secretName":"dashboard-tls"}]}}'
+    environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+
   # Step 23: Install istio
-  - name: Download Istio 1.25.2
+  - name: Detect VM architecture
+    command: uname -m
+    register: arch
+
+  - name: Set Istio arch name
+    set_fact:
+      istio_arch: "{{ 'arm64' if arch.stdout in ['aarch64', 'arm64'] else 'amd64' }}"
+
+  - name: Download Istio 1.25.2 (correct arch)
     get_url:
-      url: https://github.com/istio/istio/releases/download/1.25.2/istio-1.25.2-linux-amd64.tar.gz
+      url: "https://github.com/istio/istio/releases/download/1.25.2/istio-1.25.2-linux-{{ istio_arch }}.tar.gz"
       dest: /tmp/istio-1.25.2.tar.gz
 
   - name: Unpack Istio
