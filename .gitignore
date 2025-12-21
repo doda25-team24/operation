@@ -2,3 +2,4 @@
 .vagrant
 venv
 ./.vagrant
+alertmanager.yaml
