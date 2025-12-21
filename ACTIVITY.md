@@ -131,4 +131,6 @@ https://github.com/doda25-team24/operation/pull/14
 Updated helm chart with service monitors, updated setup.sh to install prometheus. Troubleshooting minikube/macOS issues.
 https://github.com/doda25-team24/operation/pull/20
 
+- Ibanez, Elena: 
+https://github.com/doda25-team24/operation/pull/21
 
