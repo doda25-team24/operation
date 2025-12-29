@@ -1,0 +1,41 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sms-checker-ingress
+  labels:
+    app: sms-checker
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx   # <-- new preferred way
+  rules:
+    - http:
+        paths:
+          # Frontend UI
+          - path: /$
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: sms-checker-app
+                port:
+                  number: {{ .Values.app.port }}
+
+          # Frontend metrics
+          - path: /metrics/sms-checker-app(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: sms-checker-app
+                port:
+                  number: {{ .Values.app.port }}
+
+          # Model service metrics
+          - path: /metrics/model-service(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: model-service
+                port:
+                  number: {{ .Values.modelService.port }}
+{{- end }}
