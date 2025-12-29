@@ -348,11 +348,13 @@ For testing, run
 curl -X POST http://localhost:8081/predict -H "Content-Type: application/json" -d '{"sms":"Test message"}'
 ```
 expected:
+```bash
 {
   "classifier": "decision tree",
   "result": "ham",
   "sms": "Test message"
-}
+}```
+
 
 Run
 ```bash
