@@ -320,12 +320,11 @@ Wait for all pods to reach the `Running` state before accessing the application.
 kubectl get pods -w
 ```
 
-On a separate terminal, enable tunnelling
 
-```bash
-sudo minikube tunnel
-```
 
+### 7. Monitoring - Gather metrics
+
+Using prometheus are gathering metrics for model-service.
 On a separate terminal, enable tunnelling
 
 ```bash
@@ -338,13 +337,7 @@ On a separate terminal, enable port forwarding for the new ingress
  kubectl port-forward svc/ingress-nginx-controller 8080:80 -n ingress-nginx
 ```
 
-
-
-
-### 7. Monitoring - Gather metrics
-
-Using prometheus are gathering metrics for model-service.
-After running helm install, they should be available by running the command
+After running helm install, metrics should be available by running the command
 
 ```bash
 curl http://127.0.0.1:8080/metrics/model-service
