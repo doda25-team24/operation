@@ -320,6 +320,26 @@ Wait for all pods to reach the `Running` state before accessing the application.
 kubectl get pods -w
 ```
 
+On a separate terminal, enable tunnelling
+
+```bash
+sudo minikube tunnel
+```
+
+On a separate terminal, enable tunnelling
+
+```bash
+sudo minikube tunnel
+```
+
+On a separate terminal, enable port forwarding for the new ingress
+
+```bash
+ kubectl port-forward svc/ingress-nginx-controller 8080:80 -n ingress-nginx
+```
+
+
+
 
 ### 7. Monitoring - Gather metrics
 
