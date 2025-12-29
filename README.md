@@ -334,12 +334,34 @@ sudo minikube tunnel
 On a separate terminal, enable port forwarding for the new ingress
 
 ```bash
+ kubectl port-forward svc/ingress-nginx-controller 8000:80 -n ingress-nginx
+```
+
+On a separate terminal, enable port forwarding for the frontend
+
+```bash
  kubectl port-forward svc/ingress-nginx-controller 8080:80 -n ingress-nginx
 ```
 
+For testing, run
+```bash
+curl -X POST http://localhost:8081/predict -H "Content-Type: application/json" -d '{"sms":"Test message"}'
+```
+expected:
+{
+  "classifier": "decision tree",
+  "result": "ham",
+  "sms": "Test message"
+}
+
+Run
+```bash
+ minikube -p np service model-service --url 
+```
+to see the metrics graphically.
 After running helm install, metrics should be available by running the command
 
 ```bash
-curl http://127.0.0.1:8080/metrics/model-service
+curl http://127.0.0.1:8000/metrics/model-service
 ```
 
