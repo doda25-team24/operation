@@ -4,7 +4,7 @@
 
 
 echo "Starting Minikube with profile 'np'..."
-minikube start -p np --driver=docker --memory=4600MB --cpus=2 --bootstrapper=kubeadm
+minikube start -p np --driver=docker --memory=5600MB --cpus=3 --bootstrapper=kubeadm
 minikube -p np addons enable ingress
 
 # run this every time you open a new terminal

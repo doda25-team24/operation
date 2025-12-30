@@ -313,12 +313,13 @@ kubectl get pvc
 # Check persistent volumes
 kubectl get pv
 ```
-
 Wait for all pods to reach the `Running` state before accessing the application. You can watch the pod status in real-time with:
 
 ```bash
 kubectl get pods -w
 ```
+
+Pods might take a some time to start. You have to wait until the above command indicates that all pods have reached the `Running` state for the system to be functioning as a whole.
 
 
 
@@ -337,13 +338,15 @@ On a separate terminal, enable port forwarding for the new ingress
  kubectl port-forward svc/ingress-nginx-controller 8000:80 -n ingress-nginx
 ```
 
-On a separate terminal, enable port forwarding for the frontend
+Interact with the app and execute some requests for prometheus to have activity to measure. For that you can port-forward the frontend
 
 ```bash
- kubectl port-forward svc/ingress-nginx-controller 8080:80 -n ingress-nginx
+kubectl port-forward svc/sms-checker-app 8080:8080
 ```
+and access the app on 
 
-For testing, run
+
+You can also test the python backend directly with:
 ```bash
 curl -X POST http://localhost:8081/predict -H "Content-Type: application/json" -d '{"sms":"Test message"}'
 ```
@@ -353,17 +356,59 @@ expected:
   "classifier": "decision tree",
   "result": "ham",
   "sms": "Test message"
-}```
-
-
-Run
-```bash
- minikube -p np service model-service --url 
+}
 ```
-to see the metrics graphically.
-After running helm install, metrics should be available by running the command
+
+- Metrics are exposed in Prometheus text format at `/metrics`
+- Custom metrics are defined by the application code
+- Framework-provided metrics (Spring Boot Actuator) are enabled and exposed explicitly
+
+**1. Expose Prometheus:**
+```bash
+minikube service myprom-kube-prometheus-sta-prometheus
+```
+
+**2. Check available targets:**
+- Navigate to **Status → Targets**
+- Verify both `model-service` and `sms-checker-app` are **UP**
+
+**3. Query metrics:**
+- `sms_checks_total`
+- `sms_active_requests`
+- `sms_prediction_latency_seconds_bucket`
+
+### 📈 Available Metrics
+
+#### Custom Application Metrics (Model Service)
+
+| Metric | Type | Labels | Description |
+|--------|------|--------|-------------|
+| `sms_checks_total` | Counter | `result` | Total SMS predictions |
+| `sms_active_requests` | Gauge | — | Active prediction requests |
+| `sms_prediction_latency_seconds` | Histogram | — | Prediction latency |
+
+#### Other system Metrics (Python / Prometheus Client)
+
+- `process_cpu_seconds_total` – Total CPU time consumed
+- `process_resident_memory_bytes` – Resident memory size
+- `process_virtual_memory_bytes` – Virtual memory size
+- `python_gc_objects_collected_total` – Objects collected by garbage collector
+- `python_gc_collections_total` – Number of garbage collection runs
+- `python_info` – Python runtime information
+
+### ⚙️ Configuration
+
+- Metrics scraping is enabled automatically during Helm installation
+- No manual Prometheus configuration is required
+- ServiceMonitor resources are created automatically for all services
+After running helm install, the metrics endpoints should be available by running the commands:
 
 ```bash
 curl http://127.0.0.1:8000/metrics/model-service
 ```
+for python backend 
+
+and 
+
+for app frontend-service
 

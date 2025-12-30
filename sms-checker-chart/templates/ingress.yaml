@@ -8,7 +8,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
-  ingressClassName: nginx   # <-- new preferred way
+  ingressClassName: nginx   
   rules:
     - http:
         paths:
