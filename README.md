@@ -335,26 +335,23 @@ expected:
 ```
 
 - Metrics are exposed in Prometheus text format at `/metrics`
+
 - Custom metrics are defined by the application code
 - Framework-provided metrics (Spring Boot Actuator) are enabled and exposed explicitly
 
-**1. Expose Prometheus:**
-```bash
-minikube service myprom-kube-prometheus-sta-prometheus
-```
-
-**2. Check available targets:**
-- Navigate to **Status → Targets**
-- Verify both `model-service` and `sms-checker-app` are **UP**
-
-**3. Query metrics on table/graph:**
-- `sms_checks_total`
-- `sms_active_requests`
-- `sms_prediction_latency_seconds_bucket`
 
 ### Available Metrics
 
-#### On Model Service
+#### On Frontend Service - custom
+
+| Metric | Type | Labels | Description |
+|--------|------|--------|-------------|
+| `app_sms_spam_predictions_total` | Counter | — | Total SMS spam predictions |
+| `app_requests_active` | Gauge | — | Active prediction requests |
+| `app_prediction_latency_seconds` | Histogram | — | Prediction request latency |
+| `app_prediction_latency_seconds_max` | Gauge | — | Maximum prediction latency |
+
+#### On Model Service - custom
 
 | Metric | Type | Description |
 |--------|------|-------------|
@@ -372,7 +369,6 @@ minikube service myprom-kube-prometheus-sta-prometheus
 - `python_info` – Python runtime information
 
 
-
 Metrics scraping is enabled automatically during Helm installation
 
 No manual Prometheus configuration is required
@@ -388,7 +384,21 @@ for python backend
 
 and 
 ```bash
-placeholder
+curl http://127.0.0.1:8000/metrics/sms-checker-app
 ```
-for app frontend-service
+for app frontend-service metrics
+
+You can also expose prometheus and query the metrics abovementioned
+**1. Expose Prometheus:**
+```bash
+minikube service myprom-kube-prometheus-sta-prometheus
+```
+
+**2. Check available targets:**
+- Navigate to **Status → Targets**
+- Verify both `model-service` and `sms-checker-app` are **UP**
+
+**3. Query metrics on table/graph:**
+
+
 

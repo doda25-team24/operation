@@ -2,7 +2,7 @@
 #default setup for mac and linux, builds on local minikube, not on A2
 
 echo "Starting default Minikube..."
-minikube start --driver=docker --memory=4600MB --cpus=2 --bootstrapper=kubeadm
+minikube start --driver=docker --memory=5600MB --cpus=3 --bootstrapper=kubeadm
 minikube addons enable ingress
 
 echo "Setting Docker environment for Minikube..."
@@ -17,12 +17,13 @@ docker build -t sms-checker-app:latest -f ../app/Dockerfile ../app
 # minikube image load sms-model-service:latest
 # minikube image load sms-checker-app:latest
 
+echo "Mounting shared folder..."
+nohup minikube mount ../model-service/output:/model-service/output > /tmp/minikube-mount.log 2>&1 & 
+
 echo "install prometheus"
 helm repo add prom-repo https://prometheus-community.github.io/helm-charts
 helm install myprom prom-repo/kube-prometheus-stack
 
-echo "Mounting shared folder..."
-nohup minikube mount ../model-service/output:/model-service/output > /tmp/minikube-mount.log 2>&1 & 
 echo "Deploying Helm chart..."
 helm install sms-checker ./sms-checker-chart \
   -f env.yaml \
