@@ -272,30 +272,6 @@ This deploys the application using the Helm chart, applying the environment vari
 
 Check that all resources are created and running:
 
-```bash
-# List Helm releases
-helm list
-
-# Check pod status
-kubectl get pods
-
-# Check services
-kubectl get svc
-
-# Check persistent volume claims
-kubectl get pvc
-
-# Check persistent volumes
-kubectl get pv
-```
-
-Wait for all pods to reach the `Running` state before accessing the application. You can watch the pod status in real-time with:
-
-```bash
-kubectl get pods -w
-```
-Check that all resources are created and running:
-
 
 ```bash
 # List Helm releases
@@ -322,7 +298,6 @@ kubectl get pods -w
 Pods might take a some time to start. You have to wait until the above command indicates that all pods have reached the `Running` state for the system to be functioning as a whole.
 
 
-
 ### 7. Monitoring - Gather metrics
 
 Using prometheus are gathering metrics for model-service.
@@ -343,8 +318,7 @@ Interact with the app and execute some requests for prometheus to have activity 
 ```bash
 kubectl port-forward svc/sms-checker-app 8080:8080
 ```
-and access the app on 
-
+and access the app on http://127.0.0.1:8080/sms/
 
 You can also test the python backend directly with:
 ```bash
@@ -372,22 +346,22 @@ minikube service myprom-kube-prometheus-sta-prometheus
 - Navigate to **Status → Targets**
 - Verify both `model-service` and `sms-checker-app` are **UP**
 
-**3. Query metrics:**
+**3. Query metrics on table/graph:**
 - `sms_checks_total`
 - `sms_active_requests`
 - `sms_prediction_latency_seconds_bucket`
 
-### 📈 Available Metrics
+### Available Metrics
 
-#### Custom Application Metrics (Model Service)
+#### On Model Service
 
-| Metric | Type | Labels | Description |
-|--------|------|--------|-------------|
-| `sms_checks_total` | Counter | `result` | Total SMS predictions |
-| `sms_active_requests` | Gauge | — | Active prediction requests |
-| `sms_prediction_latency_seconds` | Histogram | — | Prediction latency |
+| Metric | Type | Description |
+|--------|------|-------------|
+| `sms_checks_total` | Counter |  Total SMS predictions |
+| `sms_active_requests` | Gauge |  Active prediction requests |
+| `sms_prediction_latency_seconds` | Histogram | Prediction latency |
 
-#### Other system Metrics (Python / Prometheus Client)
+#### some more metrics (python/prometheus client)
 
 - `process_cpu_seconds_total` – Total CPU time consumed
 - `process_resident_memory_bytes` – Resident memory size
@@ -396,7 +370,7 @@ minikube service myprom-kube-prometheus-sta-prometheus
 - `python_gc_collections_total` – Number of garbage collection runs
 - `python_info` – Python runtime information
 
-### ⚙️ Configuration
+
 
 - Metrics scraping is enabled automatically during Helm installation
 - No manual Prometheus configuration is required
@@ -409,6 +383,8 @@ curl http://127.0.0.1:8000/metrics/model-service
 for python backend 
 
 and 
-
+```bash
+placeholder
+```
 for app frontend-service
 
