@@ -372,9 +372,9 @@ minikube service myprom-kube-prometheus-sta-prometheus
 
 
 
-- Metrics scraping is enabled automatically during Helm installation
-- No manual Prometheus configuration is required
-- ServiceMonitor resources are created automatically for all services
+Metrics scraping is enabled automatically during Helm installation
+No manual Prometheus configuration is required
+ServiceMonitor resources are created automatically for all services
 After running helm install, the metrics endpoints should be available by running the commands:
 
 ```bash
