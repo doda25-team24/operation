@@ -300,7 +300,8 @@ Pods might take a some time to start. You have to wait until the above command i
 
 ### 7. Monitoring - Gather metrics
 
-Using prometheus are gathering metrics for model-service.
+Using prometheus to gather metrics for model-service.
+
 On a separate terminal, enable tunnelling
 
 ```bash
@@ -373,9 +374,12 @@ minikube service myprom-kube-prometheus-sta-prometheus
 
 
 Metrics scraping is enabled automatically during Helm installation
+
 No manual Prometheus configuration is required
+
 ServiceMonitor resources are created automatically for all services
-After running helm install, the metrics endpoints should be available by running the commands:
+
+After running helm install, the metrics endpoints should be available through the ingress, by running the commands:
 
 ```bash
 curl http://127.0.0.1:8000/metrics/model-service
