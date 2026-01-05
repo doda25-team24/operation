@@ -137,3 +137,18 @@ https://github.com/doda25-team24/operation/pull/21
 - Mundala, Wojciech:
 https://github.com/doda25-team24/operation/pull/22
 
+
+### WEEK 7 (Dec 5-9)
+
+- de Oliveira Cortez, Sara:
+Fixed monitoring ingress, implemented custom metrics. Used AI for formatting metrics in SpringBoot specification, in the app repository.
+https://github.com/doda25-team24/operation/pull/23
+https://github.com/doda25-team24/operation/pull/24
+https://github.com/doda25-team24/app/pull/6
+
+
+- Ibanez, Elena: 
+https://github.com/doda25-team24/operation/pull/21
+
+- Mundala, Wojciech:
+https://github.com/doda25-team24/operation/pull/22
