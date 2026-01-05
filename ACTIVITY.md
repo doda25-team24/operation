@@ -138,7 +138,7 @@ https://github.com/doda25-team24/operation/pull/21
 https://github.com/doda25-team24/operation/pull/22
 
 
-### WEEK 7 (Dec 5-9)
+### WEEK 7 (Jan 5-9)
 
 - de Oliveira Cortez, Sara:
 Fixed monitoring ingress, implemented custom metrics. Used AI for formatting metrics in SpringBoot specification, in the app repository.
