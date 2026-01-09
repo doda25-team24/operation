@@ -148,7 +148,7 @@ https://github.com/doda25-team24/app/pull/6
 
 
 - Ibanez, Elena: 
-https://github.com/doda25-team24/operation/pull/21
+https://github.com/doda25-team24/operation/pull/26
 
 - Mundala, Wojciech:
 https://github.com/doda25-team24/operation/pull/22
