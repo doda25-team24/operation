@@ -1,14 +1,20 @@
+{{- range $name, $version := .Values.app.versions }}
+{{- if $version.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: sms-checker-app
+  name: sms-checker-app-{{ $name }}
   labels:
-    app: sms-checker-app 
+    app: sms-checker-app
+    version: {{ $name }}
 spec:
+  type: ClusterIP
   selector:
-      app: sms-checker-app
+    app: sms-checker-app
+    version: {{ $name }}
   ports:
-    - name: http  
-      port: {{ .Values.app.port }}
-      targetPort: {{ .Values.app.port }}
-      protocol: TCP
+    - port: {{ $version.port }}
+      targetPort: {{ $version.port }}
+      name: http
+{{- end }}
+{{- end }}

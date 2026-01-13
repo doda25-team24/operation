@@ -1,10 +1,18 @@
+{{- range $name, $version := .Values.modelService.versions }}
+{{- if $version.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: model-service-pvc
+  name: model-service-{{ $name }}-pvc
+  labels:
+    app: model-service
+    version: {{ $name }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.modelService.storage.size }}
+      storage: {{ $version.storage.size }}
+---
+{{- end }}
+{{- end }}

@@ -1,82 +1,36 @@
+{{- range $versionName, $version := .Values.modelService.versions }}
+{{- if $version.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: model-service-v1
+  name: model-service-{{ $versionName }}
+  labels:
+    app: model-service
+    version: {{ $versionName }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: model-service
-      version: v1
+      version: {{ $versionName }}
   template:
     metadata:
       labels:
         app: model-service
-        version: v1
+        version: {{ $versionName }}
     spec:
       containers:
         - name: model-service
-          image: {{ .Values.modelService.image }}
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: MODEL_PORT
-              value: "{{ .Values.modelService.port }}"
-            - name: MODEL_VERSION
-              value: "{{ .Values.modelService.versions.v1.versionLabel }}"
-          envFrom:                    
-            - configMapRef:
-                name: sms-checker-config
-            - secretRef:
-                name: sms-checker-secret
+          image: {{ $version.image }}
           ports:
-            - containerPort: {{ .Values.modelService.port }}
+            - containerPort: {{ $version.port }}
           volumeMounts:
             - name: model-storage
-              mountPath: {{ .Values.modelService.storage.mountPath }}
+              mountPath: {{ $version.storage.mountPath }}
       volumes:
-      - name: model-storage
-        hostPath:
-            path: /model-service/output      
-            type: Directory
-
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName:  model-service-{{ $versionName }}-pvc
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: model-service-v2
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: model-service
-      version: v2
-  template:
-    metadata:
-      labels:
-        app: model-service
-        version: v2
-    spec:
-      containers:
-        - name: model-service
-          image: {{ .Values.modelService.image }}
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: MODEL_PORT
-              value: "{{ .Values.modelService.port }}"
-            - name: MODEL_VERSION
-              value: "{{ .Values.modelService.versions.v2.versionLabel }}"
-          envFrom:                    
-            - configMapRef:
-                name: sms-checker-config
-            - secretRef:
-                name: sms-checker-secret
-          ports:
-            - containerPort: {{ .Values.modelService.port }}
-          volumeMounts:
-            - name: model-storage
-              mountPath: {{ .Values.modelService.storage.mountPath }}
-      volumes:
-      - name: model-storage
-        hostPath:
-            path: /model-service/output      
-            type: Directory
+{{- end }}
+{{- end }}
