@@ -1,5 +1,11 @@
 appVersion: "0.0.0"
 
+rateLimit:
+  enabled: true
+  maxTokens: 10
+  tokensPerFill: 10
+  fillIntervalSeconds: 60
+  
 config:
   appPort: 8080
   modelHost: "http://model-service:8081"
