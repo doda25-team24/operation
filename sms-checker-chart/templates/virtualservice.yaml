@@ -1,0 +1,51 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: sms-checker
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - sms-checker-gateway
+  http:
+  # Users with cookie user=v2 always go to v2
+  - match:
+    - headers:
+        cookie:
+          regex: ".*user=v2.*"
+    route:
+    - destination:
+        host: sms-checker-app
+        subset: v2
+
+  # Everyone else: 90/10 split
+  - route:
+    - destination:
+        host: sms-checker-app
+        subset: v1
+      weight: 90
+    - destination:
+        host: sms-checker-app
+        subset: v2
+      weight: 10
+
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: model-service
+spec:
+  hosts:
+  - model-service
+  http:
+  - route:
+    - destination:
+        host: model-service
+        subset: v1
+      weight: 90
+    - destination:
+        host: model-service
+        subset: v2
+      weight: 10
+

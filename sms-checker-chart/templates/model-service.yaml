@@ -1,14 +1,20 @@
+{{- range $name, $version := .Values.modelService.versions }}
+{{- if $version.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: model-service
+  name: model-service-{{ $name }}
   labels:
-    app: model-service 
+    app: model-service
+    version: {{ $name }}
 spec:
+  type: ClusterIP
   selector:
     app: model-service
+    version: {{ $name }}
   ports:
-    - name: http  
-      port: {{ .Values.modelService.port }}
-      targetPort: {{ .Values.modelService.port }}
-      protocol: TCP
+    - port: {{ $version.port }}
+      targetPort: {{ $version.port }}
+      name: http
+{{- end }}
+{{- end }}

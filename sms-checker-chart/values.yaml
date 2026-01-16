@@ -5,16 +5,38 @@ config:
   modelHost: "http://model-service:8081"
 
 modelService:
-  image: "sms-model-service:latest"
-  port: 8081
-  storage:
-    size: "1Gi"
-    mountPath: "/model-service/output"
+  versions:
+    v1:
+      enabled: true
+      image: "sms-model-service:latest"
+      port: 8081
+      storage:
+        size: "1Gi"
+        mountPath: "/model-service/output"
+      versionLabel: "v1"
+    v2:
+      enabled: true
+      image: "sms-model-service:latest"
+      port: 8081
+      storage:
+        size: "1Gi"
+        mountPath: "/model-service/output"
+      versionLabel: "v2"
 
 app:
-  image: "sms-checker-app:latest"
-  port: 8080
-  modelHost: "http://model-service:8081"
+  versions:
+    v1:
+      enabled: true
+      image: "sms-checker-app:latest"
+      port: 8080
+      modelHost: "http://model-service:8081"
+      versionLabel: "v1"
+    v2:
+      enabled: true
+      image: "sms-checker-app:latest"
+      port: 8080
+      modelHost: "http://model-service:8081"
+      versionLabel: "v2"
 
 ingress:
   enabled: true

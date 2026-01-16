@@ -20,7 +20,7 @@ spec:
               service:
                 name: sms-checker-app
                 port:
-                  number: {{ .Values.app.port }}
+                  number: {{ .Values.app.versions.v1.port  }}
 
           # Frontend metrics
           - path: /metrics/sms-checker-app(/|$)(.*)
@@ -29,7 +29,7 @@ spec:
               service:
                 name: sms-checker-app
                 port:
-                  number: {{ .Values.app.port }}
+                  number: {{ .Values.app.versions.v1.port  }}
 
           # Model service metrics
           - path: /metrics/model-service(/|$)(.*)
@@ -38,5 +38,5 @@ spec:
               service:
                 name: model-service
                 port:
-                  number: {{ .Values.modelService.port }}
+                  number: {{ .Values.modelService.versions.v1.port }}
 {{- end }}

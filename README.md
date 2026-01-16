@@ -308,18 +308,19 @@ On a separate terminal, enable tunnelling
 sudo minikube tunnel
 ```
 
-On a separate terminal, enable port forwarding for the new ingress
-
-```bash
- kubectl port-forward svc/ingress-nginx-controller 8000:80 -n ingress-nginx
-```
-
 Interact with the app and execute some requests for prometheus to have activity to measure. For that you can port-forward the frontend
 
 ```bash
 kubectl port-forward svc/sms-checker-app 8080:8080
 ```
 and access the app on http://127.0.0.1:8080/sms/
+
+On a separate terminal, enable port forwarding for the new ingress
+
+```bash
+ kubectl port-forward svc/ingress-nginx-controller 8000:80 -n ingress-nginx
+```
+
 
 You can also test the python backend directly with:
 ```bash
