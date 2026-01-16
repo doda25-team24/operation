@@ -1,9 +1,5 @@
 appVersion: "0.0.0"
 
-secret:
-  smtpUser: "placeholder_env_matters"
-  smtpPassword: "placeholder_env_matters"
-
 config:
   appPort: 8080
   modelHost: "http://model-service:8081"
@@ -48,13 +44,13 @@ ingress:
 kube-prometheus-stack:
   grafana:
     enabled: false
-  
+
   defaultRules:
     create: false
-  
+
   prometheus-node-exporter:
     enabled: false
-  
+
   kube-state-metrics:
     enabled: false
 
@@ -65,29 +61,36 @@ kube-prometheus-stack:
       serviceMonitorNamespaceSelector: {}
       ruleSelectorNilUsesHelmValues: false
       ruleSelector: {}
+      alerting:
+        alertmanagers:
+        - namespace: monitoring
+          name: sms-monitoring-alertmanager
+          port: web
 
   alertmanager:
     enabled: true
+
+monitoring:
+  alertmanager:
     config:
       global:
         resolve_timeout: 5m
-        smtp_smarthost: "smtp.gmail.com:587"
-        smtp_from: "elenaaibzz@gmail.com"
-        smtp_auth_username: "elenaaibzz@gmail.com"
-        smtp_auth_password: "PLACEHOLDER_CHANGE_DURING_INSTALL"
-        smtp_require_tls: true
-      
+        smtp_smarthost: "mailpit.monitoring.svc.cluster.local:1025"
+        smtp_from: "alerts@sms.local"
+        smtp_require_tls: false
+
       route:
         receiver: email-devs
         group_by: ['alertname']
         group_wait: 10s
-        group_interval: 5m
-        repeat_interval: 3h
-      
+        group_interval: 1m
+        repeat_interval: 5m
+
       receivers:
       - name: email-devs
         email_configs:
-        - to: "elenaaibzz@gmail.com"
+        - to: "devs@sms.local"
           send_resolved: true
-          headers:
-            Subject: "[ALERT] {{ .GroupLabels.alertname }}"
+
+mailhog:
+  enabled: false

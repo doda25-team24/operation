@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    release: sms
+spec:
+  groups:
+  - name: sms-app-alerts
+    rules:
+    - alert: ServiceDown
+      expr: up{job="sms-app"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "SMS Checker service is down"
+
+    - alert: HighRequestRate
+      expr: rate(http_requests_total{job="sms-app"}[1m]) > 0.25
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High request rate detected on SMS Checker"
