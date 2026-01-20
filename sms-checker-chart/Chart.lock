@@ -2,5 +2,8 @@ dependencies:
 - name: kube-prometheus-stack
   repository: https://prometheus-community.github.io/helm-charts
   version: 55.11.0
-digest: sha256:6c060ed87d33bb23663c97c8d8e02552d75a64b298a57dac93d66ac157593098
-generated: "2025-12-21T15:47:33.830512+01:00"
+- name: mailhog
+  repository: https://codecentric.github.io/helm-charts
+  version: 5.0.0
+digest: sha256:d34e58473d325e8ae51f36738d72bb52621c1291334177e6ba3151871718e2ea
+generated: "2026-01-20T23:14:25.485745792+01:00"

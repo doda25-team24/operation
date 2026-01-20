@@ -18,9 +18,7 @@ docker build -t sms-checker-app:latest -f ../app/Dockerfile ../app
 # minikube image load sms-checker-app:latest
 
 echo "Installing Istio..."
-istioctl install     
-#assuming a directory called istio-1.28.1 in home dir                                         
-kubectl apply -f ~/istio-1.28.1/samples/addons/prometheus.yaml
+istioctl install --set profile=default -y
 
 kubectl apply -f istio-system/gateway.yaml
 
@@ -32,8 +30,11 @@ echo "install prometheus"
 helm repo add prom-repo https://prometheus-community.github.io/helm-charts
 helm install myprom prom-repo/kube-prometheus-stack
 
+echo "Building Helm dependencies..."
+helm dependency build ./sms-checker-chart
+
 echo "Deploying Helm chart..."
-helm install sms-checker ./sms-checker-chart \
+helm upgrade --install sms-checker ./sms-checker-chart \
   --set secret.SMTP_USER=myuser \
   --set secret.SMTP_PASSWORD=mypassword
 
