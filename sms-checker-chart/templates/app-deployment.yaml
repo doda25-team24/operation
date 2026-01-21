@@ -22,6 +22,7 @@ spec:
       containers:
         - name: sms-checker-app
           image: {{ $version.image }}
+          imagePullPolicy: {{ $version.pullPolicy | default "IfNotPresent" }}
           ports:
             - containerPort: {{ $version.port }}
 {{- end }}

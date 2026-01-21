@@ -9,6 +9,7 @@ modelService:
     v1:
       enabled: true
       image: "sms-model-service:latest"
+      pullPolicy: "IfNotPresent"
       port: 8081
       storage:
         size: "1Gi"
@@ -17,6 +18,7 @@ modelService:
     v2:
       enabled: true
       image: "sms-model-service:latest"
+      pullPolicy: "IfNotPresent"
       port: 8081
       storage:
         size: "1Gi"
@@ -29,12 +31,14 @@ app:
       enabled: true
       image: "sms-checker-app:latest"
       port: 8080
+      pullPolicy: "IfNotPresent"
       modelHost: "http://model-service:8081"
       versionLabel: "v1"
     v2:
       enabled: true
       image: "sms-checker-app:latest"
       port: 8080
+      pullPolicy: "IfNotPresent"
       modelHost: "http://model-service:8081"
       versionLabel: "v2"
 
