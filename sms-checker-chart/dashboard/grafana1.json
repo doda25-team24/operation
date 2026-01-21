@@ -22,9 +22,7 @@
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
+          "color": { "mode": "thresholds" },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -44,17 +42,13 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
         "textMode": "auto"
       },
       "pluginVersion": "8.2.0",
       "targets": [
         {
-          "expr": "process_uptime_seconds{app=\"sms-checker-app\"}",
+          "expr": "max(process_uptime_seconds)",
           "refId": "A"
         }
       ],
@@ -135,7 +129,7 @@
       },
       "targets": [
         {
-          "expr": "sum(app_sms_spam_predictions_total)",
+          "expr": "sum(http_server_requests_seconds_count{uri=\"/sms\"})",
           "refId": "A"
         }
       ],

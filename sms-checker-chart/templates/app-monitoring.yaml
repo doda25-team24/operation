@@ -4,7 +4,7 @@ metadata:
   name: sms-checker-app
   namespace: {{ .Release.Namespace }}
   labels:
-    release: sms
+    release: myprom
 spec:
   selector:
     matchLabels:

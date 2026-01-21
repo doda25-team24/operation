@@ -24,14 +24,7 @@ spec:
           image: {{ $version.image }}
           imagePullPolicy: {{ $version.pullPolicy | default "IfNotPresent" }}
           ports:
-            - containerPort: {{ $version.port }}
-          volumeMounts:
-            - name: model-storage
-              mountPath: {{ $version.storage.mountPath }}
-      volumes:
-        - name: model-storage
-          persistentVolumeClaim:
-            claimName:  model-service-{{ $versionName }}-pvc
+            - containerPort: 8080
 ---
 {{- end }}
 {{- end }}
