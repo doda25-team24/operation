@@ -13,8 +13,8 @@ spec:
     app: sms-checker-app
     version: {{ $name }}
   ports:
-    - name: http
-      port: {{ $version.port }}
-      targetPort: {{ $version.port }}
+    - port: 8080
+      targetPort: 8080
+      name: http
 {{- end }}
 {{- end }}

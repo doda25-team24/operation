@@ -17,13 +17,11 @@ eval $(minikube -p np docker-env)
 # minikube -p np image load sms-checker-app:latest
 
 echo "Building Docker images..."
-docker build -t sms-model-service:latest -f ../model-service/Dockerfile ../model-service
-docker build -t sms-checker-app:latest -f ../app/Dockerfile ../app
+docker build --no-cache -t sms-model-service:latest -f ../model-service/Dockerfile ../model-service
+docker build --no-cache -t sms-checker-app:latest -f ../app/Dockerfile ../app
 
 echo "Installing Istio..."
-istioctl install     
-#assuming a directory called istio-1.28.1 in home dir                                         
-kubectl apply -f ~/istio-1.28.1/samples/addons/prometheus.yaml
+istioctl install --set profile=default -y
 
 kubectl apply -f istio-system/gateway.yaml
 
@@ -33,13 +31,29 @@ nohup sudo minikube tunnel -p np  > /tmp/tunnel.log 2>&1 &
 
 echo "install prometheus"
 helm repo add prom-repo https://prometheus-community.github.io/helm-charts
-helm install myprom prom-repo/kube-prometheus-stack
+helm repo update
+helm install myprom prom-repo/kube-prometheus-stack --set grafana.enabled=true
+
+echo "Building Helm dependencies..."
+helm dependency build ./sms-checker-chart
+
+echo "Waiting for Operator..."
+sleep 10
 
 echo "Deploying Helm chart..."
-helm install sms-checker ./sms-checker-chart \
+helm upgrade --install sms-checker ./sms-checker-chart \
+  --set app.image.pullPolicy=IfNotPresent \
+  --set model.image.pullPolicy=IfNotPresent \
   --set secret.SMTP_USER=myuser \
-  --set secret.SMTP_PASSWORD=mypassword
+  --set secret.SMTP_PASSWORD=mypassword \
+  --set kube-prometheus-stack.prometheus.enabled=false \
+  --set kube-prometheus-stack.grafana.enabled=false
 
+echo "Removing conflicting datasource configurations..."
+kubectl delete configmap sms-checker-monitoring-grafana-datasource --namespace default --ignore-not-found=true
+
+echo "Reloading Grafana..."
+kubectl delete pod -l app.kubernetes.io/name=grafana
 
 echo "helm list:"
 helm list

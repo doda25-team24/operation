@@ -13,8 +13,8 @@ spec:
     app: model-service
     version: {{ $name }}
   ports:
-    - port: {{ $version.port }}
-      targetPort: {{ $version.port }}
+    - port: 8081
+      targetPort: 8080
       name: http
 {{- end }}
 {{- end }}

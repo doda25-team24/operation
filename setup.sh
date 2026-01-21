@@ -42,9 +42,16 @@ helm upgrade --install sms-checker ./sms-checker-chart \
   --set app.image.pullPolicy=IfNotPresent \
   --set model.image.pullPolicy=IfNotPresent \
   --set secret.SMTP_USER=myuser \
-  --set secret.SMTP_PASSWORD=mypassword
+  --set secret.SMTP_PASSWORD=mypassword \
+  --set kube-prometheus-stack.prometheus.enabled=false \
+  --set kube-prometheus-stack.grafana.enabled=false
 
-#test functionality
+echo "Removing conflicting datasource configurations..."
+kubectl delete configmap sms-checker-monitoring-grafana-datasource --namespace default --ignore-not-found=true
+
+echo "Reloading Grafana..."
+kubectl delete pod -l app.kubernetes.io/name=grafana
+
 echo "helm list:"
 helm list
 
