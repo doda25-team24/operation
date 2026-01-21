@@ -166,5 +166,5 @@ https://github.com/doda25-team24/operation/pull/29
 ### WEEK 9 (Jan 19-23)
 
 - de Oliveira Cortez, Sara:
-Started traffic management with istio
-https://github.com/doda25-team24/operation/pull/28
+fixed a2
+https://github.com/doda25-team24/operation/pull/30
