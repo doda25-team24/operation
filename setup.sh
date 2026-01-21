@@ -9,8 +9,8 @@ echo "Setting Docker environment for Minikube..."
 eval $(minikube docker-env)
 
 echo "Building Docker images..."
-docker build -t sms-model-service:latest -f ../model-service/Dockerfile ../model-service
-docker build -t sms-checker-app:latest -f ../app/Dockerfile ../app
+docker build --no-cache -t sms-checker-app:latest ../app
+docker build --no-cache -t sms-model-service:latest ../model-service
 
 # #i did not need to load images into minikube w newprofile on my mac, but if you do, uncomment below
 # echo "Loading images into Minikube..."
@@ -28,16 +28,21 @@ nohup minikube mount ../model-service/output:/model-service/output > /tmp/miniku
 
 echo "install prometheus"
 helm repo add prom-repo https://prometheus-community.github.io/helm-charts
-helm install myprom prom-repo/kube-prometheus-stack
+helm repo update
+helm install myprom prom-repo/kube-prometheus-stack --set grafana.enabled=true
 
 echo "Building Helm dependencies..."
 helm dependency build ./sms-checker-chart
 
+echo "Waiting for Operator..."
+sleep 10
+
 echo "Deploying Helm chart..."
 helm upgrade --install sms-checker ./sms-checker-chart \
+  --set app.image.pullPolicy=IfNotPresent \
+  --set model.image.pullPolicy=IfNotPresent \
   --set secret.SMTP_USER=myuser \
   --set secret.SMTP_PASSWORD=mypassword
-
 
 #test functionality
 echo "helm list:"

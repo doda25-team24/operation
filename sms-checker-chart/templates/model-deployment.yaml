@@ -22,6 +22,7 @@ spec:
       containers:
         - name: model-service
           image: {{ $version.image }}
+          imagePullPolicy: {{ $version.pullPolicy | default "IfNotPresent" }}
           ports:
             - containerPort: {{ $version.port }}
           volumeMounts:

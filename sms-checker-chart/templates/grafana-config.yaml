@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sms-checker-dashboards
+  labels:
+    grafana_dashboard: "1" 
+    release: myprom
+data:  # <--- Moved to top level (Removed 'spec')
+  sms-ops-dashboard.json: |-
+{{ .Files.Get "dashboard/grafana1.json" | indent 4 }}
