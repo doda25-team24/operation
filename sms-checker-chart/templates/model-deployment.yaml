@@ -20,12 +20,35 @@ spec:
         app: model-service
         version: {{ $versionName }}
     spec:
+      volumes:
+        - name: model-data
+          hostPath:
+            path: /model-service/output
+            type: DirectoryOrCreate
+
+      initContainers:
+        - name: model-seeder
+          image: sms-model-seed:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Seeding model data..."
+              cp -r /model-service/output/* /shared-data/
+              echo "Seeding complete."
+          volumeMounts:
+            - name: model-data
+              mountPath: /shared-data
+
       containers:
         - name: model-service
           image: {{ $version.image }}
           imagePullPolicy: {{ $version.pullPolicy | default "IfNotPresent" }}
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: model-data
+              mountPath: /model-service/output
 ---
 {{- end }}
 {{- end }}

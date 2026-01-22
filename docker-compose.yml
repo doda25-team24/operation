@@ -8,6 +8,7 @@ services:
       dockerfile: Dockerfile
       target: production                  # F10
     container_name: sms-checker-model-service
+    restart: unless-stopped
 
     # Port inside the container is controlled by MODEL_PORT (default 8081)
     environment:
@@ -27,7 +28,11 @@ services:
     build:
       context: ../app                     # Path to the app folder
       dockerfile: Dockerfile
+      args:
+        GITHUB_ACTOR: ${GITHUB_ACTOR}
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
     container_name: sms-checker-app
+    restart: unless-stopped
 
     # APP_PORT controls Spring Boot's server.port, MODEL_HOST points to the backend
     environment:
