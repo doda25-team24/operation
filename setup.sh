@@ -20,8 +20,8 @@ docker build --no-cache -t sms-model-service:latest ../model-service
 echo "Installing Istio..."
 istioctl install --set profile=default -y
 
-kubectl apply -f istio-system/gateway.yaml
-
+echo "Enabling Istio Injection on default namespace..."
+kubectl label ns default istio-injection=enabled --overwrite
 
 echo "Mounting shared folder..."
 nohup minikube mount ../model-service/output:/model-service/output > /tmp/minikube-mount.log 2>&1 & 
@@ -54,8 +54,6 @@ kubectl delete pod -l app.kubernetes.io/name=grafana
 
 echo "helm list:"
 helm list
-
-echo "Starting a 30 second wait to ensure pods are running...... "; sleep 30; echo "Wait finished!"
 
 echo "Waiting for pods to be ready..."
 kubectl get pods
