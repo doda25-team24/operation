@@ -30,5 +30,8 @@ spec:
           imagePullPolicy: {{ $version.pullPolicy | default "IfNotPresent" }}
           ports:
             - containerPort: {{ $version.port }}
+          env:
+            - name: MODEL_HOST
+              value: "http://model-service-{{ $name }}:8081"
 {{- end }}
 {{- end }}
