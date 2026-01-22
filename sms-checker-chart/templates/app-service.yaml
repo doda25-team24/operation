@@ -16,5 +16,22 @@ spec:
     - port: 8080
       targetPort: 8080
       name: http
+---
 {{- end }}
 {{- end }}
+
+# --- STABLE GENERIC SERVICE (Added for Istio) ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sms-checker-app
+  labels:
+    app: sms-checker-app
+spec:
+  type: ClusterIP
+  selector:
+    app: sms-checker-app
+  ports:
+    - port: {{ .Values.config.appPort }}
+      targetPort: 8080
+      name: http
