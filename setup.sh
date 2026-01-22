@@ -9,7 +9,12 @@ echo "Setting Docker environment for Minikube..."
 eval $(minikube docker-env)
 
 echo "Building Docker images..."
-docker build --no-cache -t sms-checker-app:latest ../app
+docker build --target trainer -t sms-model-seed:latest ../model-service
+# 2. Build the App (UPDATED WITH CREDENTIALS)
+docker build --no-cache \
+  --build-arg GITHUB_ACTOR=$GITHUB_ACTOR \
+  --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
+  -t sms-checker-app:latest ../app
 docker build --no-cache -t sms-model-service:latest ../model-service
 
 # #i did not need to load images into minikube w newprofile on my mac, but if you do, uncomment below

@@ -17,8 +17,13 @@ eval $(minikube -p np docker-env)
 # minikube -p np image load sms-checker-app:latest
 
 echo "Building Docker images..."
+docker build --target trainer -t sms-model-seed:latest ../model-service
+# 2. Build the App (UPDATED WITH CREDENTIALS)
+docker build --no-cache \
+  --build-arg GITHUB_ACTOR=$GITHUB_ACTOR \
+  --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
+  -t sms-checker-app:latest ../app
 docker build --no-cache -t sms-model-service:latest -f ../model-service/Dockerfile ../model-service
-docker build --no-cache -t sms-checker-app:latest -f ../app/Dockerfile ../app
 
 echo "Installing Istio..."
 istioctl install --set profile=default -y
