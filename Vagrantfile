@@ -37,6 +37,7 @@ Vagrant.configure("2") do |config|
       v.cpus = CPUS_CTRL
     end
 
+    ctrl.vm.synced_folder "./shared_data", "/mnt/shared", create: true
     ctrl.vm.synced_folder "./kubeconfig", "/home/vagrant/.kube", create: true
 
     ctrl.vm.provision "ansible_local" do |ansible|
@@ -67,6 +68,8 @@ Vagrant.configure("2") do |config|
         v.memory = MEMORY_WORKER
         v.cpus = CPUS_WORKER
       end
+
+      node.vm.synced_folder "./shared_data", "/mnt/shared", create: true
 
       node.vm.provision "shell", inline: <<-SHELL
         mkdir -p /home/vagrant/.ssh

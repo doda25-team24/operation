@@ -7,31 +7,29 @@ metadata:
     app: sms-checker
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /metrics
 spec:
-  ingressClassName: nginx   
+  ingressClassName: nginx    
   rules:
-    - http:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
         paths:
           # Frontend UI
-          - path: /$
-            pathType: ImplementationSpecific
+          - path: /
+            pathType: Prefix
             backend:
               service:
                 name: sms-checker-app
                 port:
-                  number: {{ .Values.app.versions.v1.port  }}
+                  number: {{ .Values.app.versions.v1.port }}
 
-          # Frontend metrics
           - path: /metrics/sms-checker-app(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
                 name: sms-checker-app
                 port:
-                  number: {{ .Values.app.versions.v1.port  }}
+                  number: {{ .Values.app.versions.v1.port }}
 
-          # Model service metrics
           - path: /metrics/model-service(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
