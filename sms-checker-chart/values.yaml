@@ -4,6 +4,10 @@ config:
   appPort: 8080
   modelHost: "http://model-service:8081"
 
+ingress:
+  enabled: true
+  host: "sms-checker.local"
+
 modelService:
   versions:
     v1:
@@ -12,8 +16,10 @@ modelService:
       pullPolicy: "IfNotPresent"
       port: 8081
       storage:
-        size: "1Gi"
+        type: hostPath    
+        path: "/mnt/shared"
         mountPath: "/model-service/output"
+        size: "1Gi"
       versionLabel: "v1"
     v2:
       enabled: true
@@ -21,8 +27,10 @@ modelService:
       pullPolicy: "IfNotPresent"
       port: 8081
       storage:
-        size: "1Gi"
+        type: hostPath
+        path: "/mnt/shared"
         mountPath: "/model-service/output"
+        size: "1Gi"
       versionLabel: "v2"
 
 app:
@@ -42,22 +50,15 @@ app:
       modelHost: "http://model-service:8081"
       versionLabel: "v2"
 
-ingress:
-  enabled: true
-
 kube-prometheus-stack:
   grafana:
     enabled: false
-
   defaultRules:
     create: false
-
   prometheus-node-exporter:
     enabled: false
-
   kube-state-metrics:
     enabled: false
-
   prometheus:
     enabled: true
     prometheusSpec:
@@ -70,7 +71,6 @@ kube-prometheus-stack:
         - namespace: monitoring
           name: sms-monitoring-alertmanager
           port: web
-
   alertmanager:
     enabled: true
 
@@ -82,14 +82,12 @@ monitoring:
         smtp_smarthost: "mailpit.monitoring.svc.cluster.local:1025"
         smtp_from: "alerts@sms.local"
         smtp_require_tls: false
-
       route:
         receiver: email-devs
         group_by: ['alertname']
         group_wait: 10s
         group_interval: 1m
         repeat_interval: 5m
-
       receivers:
       - name: email-devs
         email_configs:

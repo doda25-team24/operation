@@ -1,37 +1,41 @@
-{{- range $name, $version := .Values.app.versions }}
-{{- if $version.enabled }}
----
+{{- range $key, $val := .Values.app.versions }}
+{{- if $val.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sms-checker-app-{{ $name }}
+  name: sms-checker-app-{{ $val.versionLabel }}
   labels:
     app: sms-checker-app
-    version: {{ $name }}
+    version: {{ $val.versionLabel }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: sms-checker-app
-      version: {{ $name }}
+      version: {{ $val.versionLabel }}
   template:
     metadata:
       labels:
         app: sms-checker-app
-        version: {{ $name }}
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
-        prometheus.io/path: "/metrics"
+        version: {{ $val.versionLabel }}
     spec:
       containers:
         - name: sms-checker-app
-          image: {{ $version.image }}
-          imagePullPolicy: {{ $version.pullPolicy | default "IfNotPresent" }}
+          image: "{{ $val.image }}"
+          imagePullPolicy: {{ $val.pullPolicy }}
           ports:
-            - containerPort: {{ $version.port }}
+            - containerPort: {{ $val.port }}
           env:
             - name: MODEL_HOST
-              value: "http://model-service-{{ $name }}:8081"
+              valueFrom:
+                configMapKeyRef:
+                  name: sms-checker-config
+                  key: MODEL_HOST
+            - name: APP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: sms-checker-config
+                  key: APP_PORT
+---
 {{- end }}
 {{- end }}

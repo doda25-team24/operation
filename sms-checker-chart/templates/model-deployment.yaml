@@ -1,54 +1,51 @@
-{{- range $versionName, $version := .Values.modelService.versions }}
-{{- if $version.enabled }}
----
+{{- range $key, $val := .Values.modelService.versions }}
+{{- if $val.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: model-service-{{ $versionName }}
+  name: model-service-{{ $val.versionLabel }}
   labels:
     app: model-service
-    version: {{ $versionName }}
+    version: {{ $val.versionLabel }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: model-service
-      version: {{ $versionName }}
+      version: {{ $val.versionLabel }}
   template:
     metadata:
       labels:
         app: model-service
-        version: {{ $versionName }}
+        version: {{ $val.versionLabel }}
     spec:
-      volumes:
-        - name: model-data
-          hostPath:
-            path: /model-service/output
-            type: DirectoryOrCreate
-
-      initContainers:
-        - name: model-seeder
-          image: sms-model-seed:latest
-          imagePullPolicy: IfNotPresent
-          command: ["/bin/sh", "-c"]
-          args:
-            - |
-              echo "Seeding model data..."
-              cp -r /model-service/output/* /shared-data/
-              echo "Seeding complete."
-          volumeMounts:
-            - name: model-data
-              mountPath: /shared-data
-
       containers:
         - name: model-service
-          image: {{ $version.image }}
-          imagePullPolicy: {{ $version.pullPolicy | default "IfNotPresent" }}
+          image: "{{ $val.image }}"
+          imagePullPolicy: {{ $val.pullPolicy }}
           ports:
-            - containerPort: 8080
+            - containerPort: {{ $val.port }}
+          env:
+            - name: MODEL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: sms-checker-config
+                  key: MODEL_SERVICE_PORT
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sms-checker-secret
+                  key: API_KEY
+          
           volumeMounts:
-            - name: model-data
-              mountPath: /model-service/output
+            - name: shared-storage
+              mountPath: {{ $val.storage.mountPath }}
+      
+      volumes:
+        - name: shared-storage
+          hostPath:
+            path: {{ $val.storage.path }}
+            type: DirectoryOrCreate
 ---
 {{- end }}
 {{- end }}
