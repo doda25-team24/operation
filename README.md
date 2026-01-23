@@ -174,6 +174,19 @@ vagrant provision
 
 These commands will create and configure the VMs according to the specifications in the Vagrantfile, and apply the Ansible playbooks to set up the Kubernetes cluster.
 
+### Accessing the Cluster Dashboard
+
+The provisioning process sets up the Kubernetes Dashboard, which is accessible via a custom local domain.
+
+To access the dashboard, you must update your local hosts file (/etc/hosts on Linux/macOS or C:\Windows\System32\drivers\etc\hosts on Windows) to map the dashboard URL to the Ingress Controller's IP:
+
+```
+192.168.56.110 dashboard.local
+```
+
+Once configured, you can access the dashboard at: https://dashboard.local
+
+
 ### Project Structure
 
 Here's an overview of the provisioning-related files and directories:

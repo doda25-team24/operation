@@ -13,7 +13,6 @@
       group: vagrant
       mode: '0755'
 
-  # Copy the kubeconfig here
   - name: Copy kubeconfig from cluster's admin.conf
     become: yes
     copy:
@@ -201,14 +200,13 @@
     environment:
       KUBECONFIG: /home/vagrant/.kube/config
 
-  - name: Create self-signed TLS cert for dashboard.local
-    command: >
-      openssl req -x509 -nodes -days 365 -newkey rsa:2048
-      -keyout /tmp/dashboard.key -out /tmp/dashboard.crt
-      -subj "/CN=dashboard.local"
-      -addext "subjectAltName=DNS:dashboard.local"
-    args:
-      creates: /tmp/dashboard.crt
+  - name: Copy provided SSL keys
+    copy:
+      src: "ssh_keys/{{ item }}"
+      dest: "/tmp/{{ item }}"
+    loop:
+      - dashboard.key
+      - dashboard.crt
 
   - name: Create/Update TLS secret for dashboard ingress
     shell: |
