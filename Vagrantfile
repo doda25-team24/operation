@@ -60,11 +60,12 @@ Vagrant.configure("2") do |config|
     node.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "ansible/node.yaml"
     end
+  end 
+
+  config.vm.provision "ansible" do |a|
+    a.compatibility_mode = "2.0"
+    a.playbook = "ansible/finalization.yml"
+    a.limit = "ctrl"  
   end
 
-	config.vm.provision :ansible do |a|
-   		a.compatibility_mode = "2.0"
-   		a.playbook = "general.yaml"
-	end
-
-end
+end  

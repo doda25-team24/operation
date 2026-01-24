@@ -1,33 +1,35 @@
 ---
 - hosts: all
   become: yes
+  vars:
+    workers: 2
   tasks:
 
     ########################################
     # STEP 4 — ADD USERS + REGISTER SSH KEYS
     ########################################
-    - name: Ensure users exist
-      ansible.builtin.user:
-        name: "{{ item }}"
-        state: present
-        shell: /bin/bash
-      loop:
-        - itsnotelena
-        - SarinhaCortez
-        - BernaJojo
-        - WotsM
+    - name: Ensure .ssh directory exists
+      ansible.builtin.file:
+        path: "/home/vagrant/.ssh"
+        state: directory
+        owner: "vagrant"
+        group: "vagrant"
+        mode: '0700'
 
-    - name: Set authorized keys from GitHub
+    - name: Ensure authorized_keys file exists
+      ansible.builtin.file:
+        path: "/home/vagrant/.ssh/authorized_keys"
+        state: touch
+        owner: "vagrant"
+        group: "vagrant"
+        mode: '0600'
+
+    - name: Add public SSH keys for team
       ansible.posix.authorized_key:
-        user: "{{ item }}"
+        user: "vagrant"
         state: present
-        key: "https://github.com/{{ item }}.keys"
-      loop:
-        - itsnotelena
-        - SarinhaCortez
-        - BernaJojo
-        - WotsM
-
+        key: "{{ lookup('file', item) }}"
+      loop: "{{ lookup('fileglob', './ssh_keys/*.pub', wantlist=True) }}"
 
     ###############################
     # STEP 5 — DISABLE SWAP
@@ -90,9 +92,12 @@
         path: /etc/hosts
         block: |
           192.168.56.100 ctrl
-          192.168.56.101 node-1
-          192.168.56.102 node-2
+          {% for i in range(workers) %}
+          192.168.56.{{ 101 + i }} node-{{ i + 1 }}
+          {% endfor %}
         create: yes
+
+
 
     - name: Configure /etc/hosts for cluster node name resolution
       copy:

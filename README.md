@@ -399,7 +399,7 @@ minikube service myprom-kube-prometheus-sta-prometheus
 - Navigate to **Status → Targets**
 - Verify both `model-service` and `sms-checker-app` are **UP**
 
-**3. Query metrics on table/graph:**
+**3. Query metrics on table/graph**
 
 
 
