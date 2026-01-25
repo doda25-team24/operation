@@ -167,4 +167,13 @@ https://github.com/doda25-team24/operation/pull/29
 
 - de Oliveira Cortez, Sara:
 fixed a2
+https://github.com/doda25-team24/operation/pull/32
+
+- Mundala, Wojciech
 https://github.com/doda25-team24/operation/pull/30
+https://github.com/doda25-team24/operation/pull/31
+https://github.com/doda25-team24/operation/pull/33
+https://github.com/doda25-team24/operation/pull/34
+https://github.com/doda25-team24/operation/pull/35
+https://github.com/doda25-team24/operation/pull/36
+https://github.com/doda25-team24/operation/pull/37
