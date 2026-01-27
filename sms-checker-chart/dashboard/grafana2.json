@@ -1,0 +1,59 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "panels": [
+    {
+      "title": "Latency Comparison (P95) - By Pod",
+      "type": "timeseries",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "avg(app_prediction_latency_seconds{quantile=\"0.95\"}) by (pod)",
+          "legendFormat": "{{pod}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 3, "drawStyle": "line" },
+          "unit": "s"
+        }
+      },
+      "description": "Shows latency per pod. Look for the pod with 'v2' in the name."
+    },
+    {
+      "title": "Traffic Volume (Requests/Sec)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "targets": [
+        {
+          "expr": "sum(rate(app_prediction_latency_seconds_count[1m])) by (pod)",
+          "legendFormat": "{{pod}} RPS",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Raw Metric Check (Debug)",
+      "type": "table",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "targets": [
+        {
+          "expr": "app_prediction_latency_seconds_count",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "description": "If this is empty, Prometheus is not scraping the app."
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": ["experiment"],
+  "timezone": "browser",
+  "title": "Experiment Results (Pod View)",
+  "uid": "experiment-pod-view",
+  "version": 1
+}
