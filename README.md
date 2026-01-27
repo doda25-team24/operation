@@ -232,6 +232,7 @@ To deploy with helm, simply execute the `setup.sh` file from the operation folde
 ```bash
 ./setup.sh
 ```
+You might need to run this command first: export GITHUB_TOKEN=paste_your_token_here
 
 ### Monitoring - Gather metrics
 
