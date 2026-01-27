@@ -5,56 +5,7 @@ This document outlines the deployment structure and data flow for the SMS Spam C
 
 The goal of this architecture is to provide a scalable, resilient platform for classifying SMS messages while allowing for safe experimentation with new application versions (v1 vs. v2) using dynamic traffic routing.
 
-## 2. Architecture Visualization
-The following diagram illustrates the high-level components, their relationships, and the flow of traffic through the cluster.
-
-```mermaid
-graph TD
-    %% External Access
-    Client([Client / Curl]) -->|Host: localhost| IG[Istio Ingress Gateway]
-    
-    %% Traffic Management Layer
-    subgraph "Istio Service Mesh"
-        IG -->|Gateway Resource| VS[VirtualService]
-        VS -.->|Routing Decision| DR[DestinationRule]
-    end
-
-    %% Application Layer
-    subgraph "Application Workloads"
-        direction TB
-        
-        %% Canary Split Logic
-        VS -->|90% Traffic| APP_V1[App v1 Deployment]
-        VS -->|10% Traffic| APP_V2[App v2 Deployment]
-        
-        %% Inter-service Communication
-        APP_V1 -->|HTTP POST| MS_SVC[Model Service ClusterIP]
-        APP_V2 -->|HTTP POST| MS_SVC
-        
-        MS_SVC -->|Load Balance| MS_PODS[Model Service Pods v1/v2]
-    end
-
-    %% Observability Layer
-    subgraph "Observability Stack"
-        PROM[Prometheus] -->|Scrapes Metrics /metrics| APP_V1
-        PROM -->|Scrapes Metrics /metrics| APP_V2
-        PROM -->|Scrapes Metrics| MS_PODS
-        
-        GRAF[Grafana] -->|Queries| PROM
-        PROM -->|Alert Rules| AM[Alertmanager]
-        AM -->|SMTP| MH[Mailhog]
-    end
-
-    %% Styling
-    classDef plain fill:#fff,stroke:#333,stroke-width:2px;
-    classDef istio fill:#e1f5fe,stroke:#0277bd,stroke-width:2px;
-    classDef obs fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
-    
-    class IG,VS,DR istio;
-    class PROM,GRAF,AM,MH obs;
-    class APP_V1,APP_V2,MS_SVC,MS_PODS plain;
-
-## 3. Component Breakdown
+## 2. Component Breakdown
 
 The deployment is divided into three logical layers:
 
@@ -83,7 +34,7 @@ This layer acts as the "Additional Use Case" for operational reliability.
 
 ---
 
-## 4. Request Data Flow
+## 3. Request Data Flow
 A typical request travels through the system as follows:
 
 1.  **Entry:** A client sends a `POST` request to `http://localhost/sms`.
@@ -99,7 +50,7 @@ A typical request travels through the system as follows:
 5.  **Prediction:** The **Model Service** processes the input and returns the classification result.
 6.  **Response:** The App wraps the result and sends the final HTTP response back to the client.
 
-## 5. Access Information
+## 4. Access Information
 
 To interact with the deployment, use the following connection details:
 
@@ -110,7 +61,7 @@ To interact with the deployment, use the following connection details:
 | **Prometheus** | Browser | `localhost:9090` | `/graph` | Metric queries and target status. |
 | **Mailhog** | Browser | `localhost:8025` | `/` | View email alerts triggered by the system. |
 
-## 6. Key Configuration Highlights
+## 5. Key Configuration Highlights
 
 ### Where is the Routing Decision Taken?
 The dynamic routing decision is **not** taken by the application code or a standard LoadBalancer. It is strictly handled by the **Istio VirtualService** configuration.
