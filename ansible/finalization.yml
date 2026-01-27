@@ -200,21 +200,28 @@
     environment:
       KUBECONFIG: /home/vagrant/.kube/config
 
-  - name: Copy provided SSL keys
-    copy:
-      src: "ssh_keys/{{ item }}"
-      dest: "/tmp/{{ item }}"
-    loop:
-      - dashboard.key
-      - dashboard.crt
+  - name: Create dashboard cert directory
+    file:
+      path: /tmp/dashboard_certs
+      state: directory
+      mode: '0700'
 
-  - name: Create/Update TLS secret for dashboard ingress
-    shell: |
-      kubectl -n kubernetes-dashboard create secret tls dashboard-tls \
-        --cert=/tmp/dashboard.crt --key=/tmp/dashboard.key \
-        --dry-run=client -o yaml | kubectl apply -f -
-    environment:
-      KUBECONFIG: /home/vagrant/.kube/config
+  - name: Generate self-signed dashboard certificate
+    command: >
+      openssl req -newkey rsa:2048 -nodes -keyout /tmp/dashboard_certs/dashboard.key
+      -x509 -days 365 -out /tmp/dashboard_certs/dashboard.crt
+      -subj "/CN=kubernetes-dashboard"
+    args:
+      creates: /tmp/dashboard_certs/dashboard.crt  # Skips if file already exists
+
+  - name: Create Kubernetes dashboard secret
+    shell: >
+      kubectl create secret generic kubernetes-dashboard-certs 
+      --from-file=/tmp/dashboard_certs/dashboard.key 
+      --from-file=/tmp/dashboard_certs/dashboard.crt 
+      -n kubernetes-dashboard
+    ignore_errors: yes  # Ignore if secret already exists
+
 
   - name: Patch dashboard ingress to enable TLS
     command: >

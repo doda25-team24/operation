@@ -6,14 +6,14 @@
     ########################################
     # STEP 4 — ADD USERS + REGISTER SSH KEYS
     ########################################
-    - name: Configure persistent SSH host key
-      ansible.builtin.copy:
-        src: ssh_keys/ssh_host_ed25519_key
-        dest: /etc/ssh/ssh_host_ed25519_key
-        owner: root
-        group: root
-        mode: '0600'
-      notify: Restart SSH
+    #    - name: Configure persistent SSH host key
+    # ansible.builtin.copy:
+    #   src: ssh_keys/ssh_host_ed25519_key
+    #   dest: /etc/ssh/ssh_host_ed25519_key
+    #   owner: root
+    #   group: root
+    #   mode: '0600'
+    # notify: Restart SSH
 
     - name: Configure persistent SSH public host key
       ansible.builtin.copy:
