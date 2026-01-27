@@ -1,4 +1,4 @@
-# README V1 | SMS Checker – Operation
+# README | SMS Checker – Operation
 
 This repository contains everything needed to **run** the SMS Checker system using Docker Compose.
 
@@ -170,6 +170,11 @@ To set up the infrastructure for this project, use Vagrant to provision the requ
 ```bash
 vagrant up
 vagrant provision
+```
+
+To execute the finalization.yml file:
+```bash
+ansible-playbook -u vagrant --private-key=../.vagrant/machines/ctrl/virtualbox/private_key -i 192.168.56.100, finalization.yml
 ```
 
 These commands will create and configure the VMs according to the specifications in the Vagrantfile, and apply the Ansible playbooks to set up the Kubernetes cluster.
