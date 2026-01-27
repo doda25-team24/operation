@@ -55,7 +55,7 @@ A typical request travels through the system as follows:
 To interact with the deployment, use the following connection details:
 
 | Component | Access Method | Host / Port | Description |
-| :--- | :--- | :--- | :--- | :--- |
+| :--- | :--- | :--- | :--- |
 | **SMS Application** | HTTP (Postman/Curl) | `localhost:8080` (Port-forward) <br> OR `Gateway IP:80` | Main endpoint for classifying messages. |
 | **Grafana** | Browser | `localhost:3000` | Operational Dashboards. |
 | **Prometheus** | Browser | `localhost:9090` | Metric queries and target status. |
