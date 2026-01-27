@@ -220,98 +220,15 @@ Here's an overview of the provisioning-related files and directories:
 
 ## Running the Helm Chart
 
-Once the infrastructure is provisioned, deploy the application using Helm. Follow these steps in order:
+Once the infrastructure is provisioned, deploy the application using Helm.
 
-### 1. Start Minikube
-
-```bash
-minikube start --driver=docker --memory=4600MB --cpus=2 --bootstrapper=kubeadm
-```
-
-This initializes a local Kubernetes cluster with 4.6GB of memory and 2 CPUs.
-
-### 2. Configure Docker Environment
+To deploy with helm, simply execute the `setup.sh` file from the operation folder:
 
 ```bash
-eval $(minikube docker-env)
+./setup.sh
 ```
 
-This configures the shell to use Minikube's Docker daemon, allowing you to build images directly inside the cluster.
-
-### 3. Build Docker Images
-
-```bash
-docker build -t sms-model-service:latest -f ../model-service/Dockerfile ../model-service
-docker build -t sms-checker-app:latest -f ../app/Dockerfile ../app
-```
-
-
-### 3. b.(Optional) Load Images into Minikube
-
-If your images aren't appearing in the cluster after building, explicitly load them:
-
-```bash
-minikube image load sms-model-service:latest
-minikube image load sms-checker-app:latest
-```
-
-**Note:** This step may not be necessary on macOS when using `eval $(minikube docker-env)`, but is required on some systems or when using different Minikube profiles.
-
-
-Builds both the model service and the application images from their respective Dockerfiles.
-
-### 4. Mount Shared Folder
-
-```bash
-nohup minikube mount ../model-service/output:/model-service/output > /tmp/minikube-mount.log 2>&1 &
-```
-
-This mounts the local `model-service/output` directory into the Minikube VM, allowing persistent data storage between the host and the cluster. The process runs in the background.
-
-### 5. Deploy with Helm
-
-```bash
-helm install sms-checker ./sms-checker-chart \
-  -f env.yaml \
-  --set secret.SMTP_USER=myuser \
-  --set secret.SMTP_PASSWORD=mypassword
-```
-
-**Replace** `myuser` and `mypassword` with your actual SMTP credentials.
-
-This deploys the application using the Helm chart, applying the environment variables from `env.yaml` and the SMTP credentials you provide.
-
-### 6. Verify Deployment
-
-Check that all resources are created and running:
-
-
-```bash
-# List Helm releases
-helm list
-
-# Check pod status
-kubectl get pods
-
-# Check services
-kubectl get svc
-
-# Check persistent volume claims
-kubectl get pvc
-
-# Check persistent volumes
-kubectl get pv
-```
-Wait for all pods to reach the `Running` state before accessing the application. You can watch the pod status in real-time with:
-
-```bash
-kubectl get pods -w
-```
-
-Pods might take a some time to start. You have to wait until the above command indicates that all pods have reached the `Running` state for the system to be functioning as a whole.
-
-
-### 7. Monitoring - Gather metrics
+### Monitoring - Gather metrics
 
 Using prometheus to gather metrics for model-service.
 
@@ -412,7 +329,33 @@ minikube service myprom-kube-prometheus-sta-prometheus
 - Navigate to **Status → Targets**
 - Verify both `model-service` and `sms-checker-app` are **UP**
 
-**3. Query metrics on table/graph:**
+#### Visualizing with Grafana
+
+To view the dashboards, port-forward using kubectl:
+
+```bash
+kubectl port-forward svc/sms-checker-grafana 3000:80
+```
+Open Grafana in your browser at `http://localhost:3000/`
+
+Default credentials (from kube-prometheus-stack):
+Username: admin
+Password: Obtain via
+```bash
+kubectl get secret --namespace default myprom-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```
+The grafana dashboard for A3 monitoring is named 'SMS Checker Operations'
+
+#### Continuous experimentation
+
+To run the continous experimentation tests, execute `test_experiments.sh` from the operation folder
+```bash
+./test_experiments.sh
+```
+
+To view the results, follow the same procedure as in the 'Visualizing with Grafana' section. The continuous experimentation dashboard is named 'Experiment Results (Pod View)'
+
+
 
 
 
