@@ -11,6 +11,14 @@ minikube -p np addons enable ingress
 echo "Setting Docker environment for Minikube..."
 eval $(minikube -p np docker-env)
 
+echo "Mounting shared folder..."
+minikube ssh "sudo mkdir -p /mnt/shared"
+
+echo "Copying model file to Minikube..."
+if [ -f "../model-service/output/model.joblib" ]; then
+    minikube cp ../model-service/output/model.joblib /mnt/shared/model.joblib
+fi
+
 #i did not need to load images into minikube w np on my mac, but if you do, uncomment below
 # echo "Loading images into Minikube..."
 # minikube -p np image load sms-model-service:latest

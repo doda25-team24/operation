@@ -1,6 +1,0 @@
-#readme
-kubectl get svc istio-ingressgateway -n istio-system
-to check 
-#faço o mesmo setup e depois ponho uma secção no readme para o A3 e outra para o A4
-
-..... preciso de dar na mesma port forwarding À app? se calhar não....

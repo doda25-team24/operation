@@ -26,11 +26,12 @@ spec:
           ports:
             - containerPort: {{ $val.port }}
           env:
+            - name: MODEL_URL
+              value: "file:///model-service/output/model.joblib"
+            
             - name: MODEL_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: sms-checker-config
-                  key: MODEL_SERVICE_PORT
+              value: "8081"
+
             - name: API_KEY
               valueFrom:
                 secretKeyRef:

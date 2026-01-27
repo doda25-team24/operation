@@ -27,15 +27,7 @@ spec:
             - containerPort: {{ $val.port }}
           env:
             - name: MODEL_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: sms-checker-config
-                  key: MODEL_HOST
-            - name: APP_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: sms-checker-config
-                  key: APP_PORT
+              value: "http://model-service:8081"
 ---
 {{- end }}
 {{- end }}

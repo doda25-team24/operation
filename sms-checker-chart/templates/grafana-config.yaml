@@ -5,6 +5,9 @@ metadata:
   labels:
     grafana_dashboard: "1" 
     release: myprom
-data:  # <--- Moved to top level (Removed 'spec')
+data: 
   sms-ops-dashboard.json: |-
 {{ .Files.Get "dashboard/grafana1.json" | indent 4 }}
+
+  sms-experiment-dashboard.json: |-
+{{ .Files.Get "dashboard/grafana2.json" | indent 4 }}
