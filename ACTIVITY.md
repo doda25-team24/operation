@@ -177,3 +177,7 @@ https://github.com/doda25-team24/operation/pull/34
 https://github.com/doda25-team24/operation/pull/35
 https://github.com/doda25-team24/operation/pull/36
 https://github.com/doda25-team24/operation/pull/37
+
+### WEEK 10 (Jan 26-27)
+- Mundala, Wojciech
+https://github.com/doda25-team24/operation/pull/40
