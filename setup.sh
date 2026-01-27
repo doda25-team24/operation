@@ -8,6 +8,14 @@ minikube addons enable ingress
 echo "Setting Docker environment for Minikube..."
 eval $(minikube docker-env)
 
+echo "Mounting shared folder..."
+minikube ssh "sudo mkdir -p /mnt/shared"
+
+echo "Copying model file to Minikube..."
+if [ -f "../model-service/output/model.joblib" ]; then
+    minikube cp ../model-service/output/model.joblib /mnt/shared/model.joblib
+fi
+
 echo "Building Docker images..."
 docker build --target trainer -t sms-model-seed:latest ../model-service
 # 2. Build the App (UPDATED WITH CREDENTIALS)
